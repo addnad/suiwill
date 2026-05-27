@@ -12,6 +12,7 @@ import Widget from "@/components/dashboard/widget";
 import Notifications from "@/components/dashboard/notifications";
 import { MobileChat } from "@/components/chat/mobile-chat";
 import Chat from "@/components/chat";
+import { Providers } from "@/components/providers";
 
 const mockData = mockDataJson as MockData;
 
@@ -30,7 +31,7 @@ const isV0 = process.env["VERCEL_URL"]?.includes("vusercontent.net") ?? false;
 
 export const metadata: Metadata = {
   title: {
-    template: "%s – VIGIL",
+    template: "%s - VIGIL",
     default: "VIGIL — Onchain Dead Man's Switch",
   },
   description:
@@ -56,29 +57,29 @@ export default function RootLayout({
       <body
         className={`${rebelGrotesk.variable} ${robotoMono.variable} antialiased`}
       >
-        <V0Provider isV0={isV0}>
-          <SidebarProvider>
-            <MobileHeader mockData={mockData} />
-
-            <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-gap lg:px-sides">
-              <div className="hidden lg:block col-span-2 top-0 relative">
-                <DashboardSidebar />
-              </div>
-              <div className="col-span-1 lg:col-span-7">{children}</div>
-              <div className="col-span-3 hidden lg:block">
-                <div className="space-y-gap py-sides min-h-screen max-h-screen sticky top-0 overflow-clip">
-                  <Widget widgetData={mockData.widgetData} />
-                  <Notifications
-                    initialNotifications={mockData.notifications}
-                  />
-                  <Chat />
+        <Providers>
+          <V0Provider isV0={isV0}>
+            <SidebarProvider>
+              <MobileHeader mockData={mockData} />
+              <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-gap lg:px-sides">
+                <div className="hidden lg:block col-span-2 top-0 relative">
+                  <DashboardSidebar />
+                </div>
+                <div className="col-span-1 lg:col-span-7">{children}</div>
+                <div className="col-span-3 hidden lg:block">
+                  <div className="space-y-gap py-sides min-h-screen max-h-screen sticky top-0 overflow-clip">
+                    <Widget widgetData={mockData.widgetData} />
+                    <Notifications
+                      initialNotifications={mockData.notifications}
+                    />
+                    <Chat />
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <MobileChat />
-          </SidebarProvider>
-        </V0Provider>
+              <MobileChat />
+            </SidebarProvider>
+          </V0Provider>
+        </Providers>
       </body>
     </html>
   );

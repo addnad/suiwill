@@ -123,3 +123,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+/* VIGIL — dapp-kit ConnectButton overrides */
+.dark [data-dapp-kit] {
+  --dapp-kit-backgroundColors-primaryButton: oklch(0.9851 0 0 / 5%);
+  --dapp-kit-backgroundColors-primaryButtonHover: oklch(0.9851 0 0 / 10%);
+  --dapp-kit-colors-primaryButton: oklch(0.9851 0 0);
+  --dapp-kit-backgroundColors-dropdownMenu: oklch(0.2029 0.0037 345.62);
+  --dapp-kit-backgroundColors-modalPrimary: oklch(0.2029 0.0037 345.62);
+  --dapp-kit-backgroundColors-modalSecondary: oklch(0.205 0 0);
+  --dapp-kit-colors-body: oklch(0.9851 0 0);
+  --dapp-kit-colors-bodyMuted: oklch(0.708 0 0);
+  --dapp-kit-shadows-primaryButton: none;
+  --dapp-kit-fontSizes-small: 11px;
+  --dapp-kit-typography-fontFamily: var(--font-roboto-mono), monospace;
+  --dapp-kit-typography-letterSpacing: 0.1em;
+}
+
+.dark [data-dapp-kit].Button_buttonVariants__x1s81q0,
+.dark [data-dapp-kit] .Button_buttonVariants__x1s81q0 {
+  width: 100%;
+  border: 1px solid oklch(1 0 0 / 10%);
+  border-radius: 0.375rem;
+}
+
+.dark [data-dapp-kit].Button_buttonVariants_size_lg__x1s81q4,
+.dark [data-dapp-kit] .Button_buttonVariants_size_lg__x1s81q4 {
+  padding: 0.5rem 0.75rem;
+  height: auto;
+  font-size: 11px;
+}
