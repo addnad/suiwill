@@ -1,0 +1,11 @@
+[package]
+name = "suiwill"
+edition = "2024"
+license = "MIT"
+authors = ["SuiWill Team"]
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
+
+[addresses]
+suiwill = "0x0"

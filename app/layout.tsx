@@ -31,8 +31,8 @@ const isV0 = process.env["VERCEL_URL"]?.includes("vusercontent.net") ?? false;
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - VIGIL",
-    default: "VIGIL — Onchain Dead Man's Switch",
+    template: "%s - SuiWill",
+    default: "SuiWill — Onchain Dead Man's Switch",
   },
   description:
     "The trustless digital estate vault on Sui. If you stop signing, your will executes. Powered by Sui and Walrus.",

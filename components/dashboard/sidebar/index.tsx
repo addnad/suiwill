@@ -28,7 +28,7 @@ import { WalletButton } from "@/components/wallet-button";
 const data = {
   navMain: [
     {
-      title: "VIGIL OS",
+      title: "SUIWILL",
       items: [
         {
           title: "Overview",
@@ -117,8 +117,8 @@ export function DashboardSidebar({
           <VIGILIcon className="size-8" />
         </div>
         <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="text-2xl font-display tracking-widest">VIGIL</span>
-          <span className="text-xs uppercase opacity-60">Onchain Will OS</span>
+          <span className="text-2xl font-display tracking-widest">SUIWILL</span>
+          <span className="text-xs uppercase opacity-60">Dead Man's Switch on Sui</span>
         </div>
       </SidebarHeader>
 
