@@ -1,0 +1,271 @@
+{
+  "dashboardStats": [
+    {
+      "label": "WILL STATUS",
+      "value": "ACTIVE",
+      "description": "SUI MAINNET",
+      "intent": "positive",
+      "icon": "gear",
+      "direction": "up"
+    },
+    {
+      "label": "DAYS UNTIL TRIGGER",
+      "value": "177",
+      "description": "180 DAY TIMEOUT SET",
+      "intent": "neutral",
+      "icon": "proccesor",
+      "direction": "up"
+    },
+    {
+      "label": "LAST HEARTBEAT",
+      "value": "3d ago",
+      "description": "LAST SIGNED TX ON SUI",
+      "intent": "positive",
+      "icon": "boom",
+      "tag": "HEALTHY"
+    }
+  ],
+  "chartData": {
+    "week": [
+      {
+        "date": "06/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "07/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "08/06",
+        "sales": 0,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "09/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "10/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "11/06",
+        "sales": 0,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "12/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "13/06",
+        "sales": 1,
+        "spendings": 0,
+        "coffee": 0
+      }
+    ],
+    "month": [
+      {
+        "date": "Jan",
+        "sales": 12,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Feb",
+        "sales": 8,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Mar",
+        "sales": 15,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Apr",
+        "sales": 10,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "May",
+        "sales": 18,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Jun",
+        "sales": 6,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Jul",
+        "sales": 14,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Aug",
+        "sales": 11,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Sep",
+        "sales": 9,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Oct",
+        "sales": 13,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Nov",
+        "sales": 16,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "Dec",
+        "sales": 7,
+        "spendings": 0,
+        "coffee": 0
+      }
+    ],
+    "year": [
+      {
+        "date": "2021",
+        "sales": 80,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "2022",
+        "sales": 120,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "2023",
+        "sales": 95,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "2024",
+        "sales": 140,
+        "spendings": 0,
+        "coffee": 0
+      },
+      {
+        "date": "2025",
+        "sales": 62,
+        "spendings": 0,
+        "coffee": 0
+      }
+    ]
+  },
+  "rebelsRanking": [
+    {
+      "id": 1,
+      "name": "0x4f3a...b12c",
+      "handle": "BENEFICIARY 01",
+      "streak": "60% SHARE",
+      "points": 60,
+      "avatar": "/avatars/user_krimson.png",
+      "featured": true,
+      "subtitle": "PRIMARY BENEFICIARY"
+    },
+    {
+      "id": 2,
+      "name": "0x9d1b...77ea",
+      "handle": "BENEFICIARY 02",
+      "streak": "",
+      "points": 40,
+      "avatar": "/avatars/user_mati.png"
+    }
+  ],
+  "securityStatus": [
+    {
+      "title": "WATCHER AGENT",
+      "value": "ONLINE",
+      "status": "[MONITORING...]",
+      "variant": "success"
+    },
+    {
+      "title": "WALRUS MESSAGE",
+      "value": "STORED",
+      "status": "[ENCRYPTED]",
+      "variant": "success"
+    },
+    {
+      "title": "GRACE PERIOD",
+      "value": "7 DAYS",
+      "status": "[NOT TRIGGERED]",
+      "variant": "warning"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1",
+      "title": "WILL DEPLOYED",
+      "message": "Your VIGIL will contract is live on Sui mainnet. Watcher agent is now monitoring your wallet activity.",
+      "timestamp": "2025-06-10T13:39:00Z",
+      "type": "success",
+      "read": false,
+      "priority": "medium"
+    },
+    {
+      "id": "notif-2",
+      "title": "HEARTBEAT DETECTED",
+      "message": "Signed transaction detected on Sui. Your inactivity clock has been reset. 177 days remaining.",
+      "timestamp": "2025-06-10T10:15:00Z",
+      "type": "info",
+      "read": false,
+      "priority": "low"
+    },
+    {
+      "id": "notif-3",
+      "title": "WALRUS STORAGE CONFIRMED",
+      "message": "Your final message has been stored on Walrus. Blob ID anchored to your Move contract.",
+      "timestamp": "2025-06-09T09:00:00Z",
+      "type": "info",
+      "read": true,
+      "priority": "medium"
+    },
+    {
+      "id": "notif-4",
+      "title": "WATCHER AGENT ALERT",
+      "message": "No signed transaction detected in 14 days. Grace period will trigger in 166 days if no activity.",
+      "timestamp": "2025-06-08T08:00:00Z",
+      "type": "warning",
+      "read": true,
+      "priority": "high"
+    }
+  ],
+  "widgetData": {
+    "location": "Sui Mainnet",
+    "timezone": "UTC+0",
+    "temperature": "ACTIVE",
+    "weather": "Will Healthy",
+    "date": "Wednesday, June 10th, 2025"
+  }
+}
