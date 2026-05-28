@@ -16,11 +16,10 @@ export type WillData = {
   beneficiaries: { address: string; share: number }[];
 };
 
-function parseWillObject(obj: SuiObjectData): WillData | null {
+export function parseWillObject(obj: SuiObjectData): WillData | null {
   if (!obj.content || obj.content.dataType !== "moveObject") return null;
   const fields = obj.content.fields as Record<string, unknown>;
 
-  // Parse beneficiaries from VecMap
   const beneficiaryMap = fields.beneficiaries as {
     fields: { contents: { fields: { key: string; value: string } }[] };
   };
@@ -42,32 +41,53 @@ function parseWillObject(obj: SuiObjectData): WillData | null {
   };
 }
 
-export function useWill() {
+export function useWillId() {
   const account = useCurrentAccount();
 
-  const { data, isLoading, error, refetch } = useSuiClientQuery(
-    "getOwnedObjects",
+  // Query WillCreated events filtered by sender (owner)
+  const { data, isLoading, error } = useSuiClientQuery(
+    "queryEvents",
     {
-      owner: account?.address ?? "",
-      filter: {
-        StructType: `${PACKAGE_ID}::will::SuiWill`,
+      query: {
+        MoveEventType: `${PACKAGE_ID}::will::WillCreated`,
       },
-      options: {
-        showContent: true,
-        showType: true,
-      },
+      limit: 50,
     },
     {
       enabled: !!account?.address && !!PACKAGE_ID,
-      refetchInterval: 10000,
     }
   );
 
-  const willObject = data?.data?.[0];
-  const will =
-    willObject?.data ? parseWillObject(willObject.data) : null;
+  // Find the most recent will created by this account
+  const willEvent = data?.data?.find(
+    (e) => e.sender === account?.address
+  );
 
-  // Compute derived values
+  const willId = willEvent
+    ? (willEvent.parsedJson as { will_id: string })?.will_id
+    : null;
+
+  return { willId, isLoading, error };
+}
+
+export function useWill() {
+  const account = useCurrentAccount();
+  const { willId, isLoading: idLoading } = useWillId();
+
+  const { data, isLoading: objLoading, error, refetch } = useSuiClientQuery(
+    "getObject",
+    {
+      id: willId ?? "",
+      options: { showContent: true, showType: true },
+    },
+    {
+      enabled: !!willId,
+      refetchInterval: 15000,
+    }
+  );
+
+  const will = data?.data ? parseWillObject(data.data) : null;
+
   const now = Date.now();
   const msUntilTrigger = will
     ? Math.max(0, will.last_seen_ms + will.timeout_ms - now)
@@ -95,7 +115,8 @@ export function useWill() {
 
   return {
     will,
-    isLoading,
+    willId,
+    isLoading: idLoading || objLoading,
     error,
     refetch,
     daysUntilTrigger,

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -25,43 +26,12 @@ import LockIcon from "@/components/icons/lock";
 import { useIsV0 } from "@/lib/v0-context";
 import { WalletButton } from "@/components/wallet-button";
 
-const data = {
-  navMain: [
-    {
-      title: "SUIWILL",
-      items: [
-        {
-          title: "Overview",
-          url: "/",
-          icon: BracketsIcon,
-          isActive: true,
-          locked: false,
-        },
-        {
-          title: "My Will",
-          url: "/will",
-          icon: ProcessorIcon,
-          isActive: false,
-          locked: false,
-        },
-        {
-          title: "Watcher Agent",
-          url: "/watcher",
-          icon: CuteRobotIcon,
-          isActive: false,
-          locked: false,
-        },
-        {
-          title: "Settings",
-          url: "/settings",
-          icon: GearIcon,
-          isActive: false,
-          locked: false,
-        },
-      ],
-    },
-  ],
-};
+const navItems = [
+  { title: "Overview",      url: "/",            icon: BracketsIcon,  locked: false },
+  { title: "My Will",       url: "/will/active", icon: ProcessorIcon, locked: false },
+  { title: "Watcher Agent", url: "/watcher",     icon: CuteRobotIcon, locked: false },
+  { title: "Settings",      url: "/settings",    icon: GearIcon,      locked: false },
+];
 
 function VIGILIcon({ className }: { className?: string }) {
   return (
@@ -109,6 +79,7 @@ export function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const isV0 = useIsV0();
+  const pathname = usePathname();
 
   return (
     <Sidebar {...props} className={cn("py-sides", className)}>
@@ -123,18 +94,14 @@ export function DashboardSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        {data.navMain.map((group, i) => (
-          <SidebarGroup
-            className={cn(i === 0 && "rounded-t-none")}
-            key={group.title}
-          >
-            <SidebarGroupLabel>
-              <Bullet className="mr-2" />
-              {group.title}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => (
+        <SidebarGroup className="rounded-t-none">
+          <SidebarGroupLabel>
+            <Bullet className="mr-2" />
+            SUIWILL
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => (
                   <SidebarMenuItem
                     key={item.title}
                     className={cn(
@@ -145,7 +112,7 @@ export function DashboardSidebar({
                   >
                     <SidebarMenuButton
                       asChild={!item.locked}
-                      isActive={item.isActive}
+                      isActive={pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url.replace("/active", "")))}
                       disabled={item.locked}
                       className={cn(
                         "disabled:cursor-not-allowed",
@@ -170,11 +137,10 @@ export function DashboardSidebar({
                       </SidebarMenuBadge>
                     )}
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-0">
