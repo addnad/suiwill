@@ -1,0 +1,14 @@
+{
+  "name": "suiwill-watcher",
+  "version": "1.0.0",
+  "description": "VIGIL watcher agent — monitors SuiWill contracts and triggers grace periods",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-vm-modules index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@mysten/sui": "^2.17.0"
+  },
+  "type": "module"
+}
