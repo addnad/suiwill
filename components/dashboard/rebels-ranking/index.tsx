@@ -1,94 +1,59 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import DashboardCard from "@/components/dashboard/card";
-import type { RebelRanking } from "@/types/dashboard";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
 
-interface RebelsRankingProps {
-  rebels: RebelRanking[];
+interface Beneficiary {
+  id: number;
+  name: string;
+  handle: string;
+  points: number;
+  featured?: boolean;
+  subtitle?: string;
 }
 
-export default function RebelsRanking({ rebels }: RebelsRankingProps) {
+interface BeneficiariesProps {
+  rebels: Beneficiary[];
+}
+
+export default function RebelsRanking({ rebels }: BeneficiariesProps) {
   return (
     <DashboardCard
-      title="REBELS RANKING"
+      title="BENEFICIARIES"
       intent="default"
-      addon={<Badge variant="outline-warning">2 NEW</Badge>}
+      addon={<Badge variant="outline-warning">{rebels.length} WALLET{rebels.length !== 1 ? "S" : ""}</Badge>}
     >
-      <div className="space-y-4">
-        {rebels.map((rebel) => (
-          <div key={rebel.id} className="flex items-center justify-between">
-            <div className="flex items-center gap-1 w-full">
-              <div
-                className={cn(
-                  "flex items-center justify-center rounded text-sm font-bold px-1.5 mr-1 md:mr-2",
-                  rebel.featured
-                    ? "h-10 bg-primary text-primary-foreground"
-                    : "h-8 bg-secondary text-secondary-foreground"
-                )}
-              >
-                {rebel.id}
+      <div className="space-y-3">
+        {rebels.map((b) => (
+          <div key={b.id} className="flex items-center justify-between p-3 rounded-lg bg-accent/50 border border-border">
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center justify-center rounded text-xs font-bold px-2 py-1 font-mono ${
+                b.featured
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground"
+              }`}>
+                {String(b.id).padStart(2, "0")}
               </div>
-              <div
-                className={cn(
-                  "rounded-lg overflow-hidden bg-muted",
-                  rebel.featured ? "size-14 md:size-16" : "size-10 md:size-12"
+              <div className="flex flex-col">
+                <span className="font-mono text-sm text-foreground">{b.name}</span>
+                {b.subtitle && (
+                  <span className="font-mono text-[10px] text-muted-foreground uppercase">{b.subtitle}</span>
                 )}
-              >
-                {rebel.avatar ? (
-                  <Image
-                    src={rebel.avatar}
-                    alt={rebel.name}
-                    width={120}
-                    height={120}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-muted" />
+                {!b.subtitle && b.handle && (
+                  <span className="font-mono text-[10px] text-muted-foreground uppercase">{b.handle}</span>
                 )}
-              </div>
-              <div
-                className={cn(
-                  "flex flex-1 h-full items-center justify-between py-2 px-2.5 rounded",
-                  rebel.featured && "bg-accent"
-                )}
-              >
-                <div className="flex flex-col flex-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-baseline gap-2">
-                      <span
-                        className={cn(
-                          "font-display",
-                          rebel.featured
-                            ? "text-xl md:text-2xl"
-                            : "text-lg md:text-xl"
-                        )}
-                      >
-                        {rebel.name}
-                      </span>
-                      <span className="text-muted-foreground text-xs md:text-sm">
-                        {rebel.handle}
-                      </span>
-                    </div>
-                    <Badge variant={rebel.featured ? "default" : "secondary"}>
-                      {rebel.points} POINTS
-                    </Badge>
-                  </div>
-                  {rebel.subtitle && (
-                    <span className="text-sm text-muted-foreground italic">
-                      {rebel.subtitle}
-                    </span>
-                  )}
-                  {rebel.streak && !rebel.featured && (
-                    <span className="text-sm text-muted-foreground italic">
-                      {rebel.streak}
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
+            <Badge variant={b.featured ? "default" : "secondary"} className="font-mono text-xs">
+              {b.points}%
+            </Badge>
           </div>
         ))}
+        {rebels.length === 0 && (
+          <p className="font-mono text-xs text-muted-foreground text-center py-4">
+            NO BENEFICIARIES CONFIGURED
+          </p>
+        )}
       </div>
     </DashboardCard>
   );

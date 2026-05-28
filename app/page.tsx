@@ -6,7 +6,6 @@ import DashboardPageLayout from "@/components/dashboard/layout";
 import DashboardStat from "@/components/dashboard/stat";
 import DashboardChart from "@/components/dashboard/chart";
 import RebelsRanking from "@/components/dashboard/rebels-ranking";
-import SecurityStatus from "@/components/dashboard/security-status";
 import BracketsIcon from "@/components/icons/brackets";
 import GearIcon from "@/components/icons/gear";
 import ProcessorIcon from "@/components/icons/proccesor";
@@ -154,27 +153,7 @@ export default function DashboardOverview() {
     subtitle: i === 0 ? "PRIMARY BENEFICIARY" : undefined,
   }));
 
-  // Build security statuses
-  const securityStatuses = [
-    {
-      title: "WATCHER AGENT",
-      value: "ONLINE",
-      status: "[MONITORING...]",
-      variant: "success" as const,
-    },
-    {
-      title: "WALRUS MESSAGE",
-      value: will.walrus_blob_id ? "STORED" : "NONE",
-      status: will.walrus_blob_id ? "[ENCRYPTED]" : "[NO MESSAGE]",
-      variant: (will.walrus_blob_id ? "success" : "warning") as const,
-    },
-    {
-      title: "GRACE PERIOD",
-      value: will.in_grace ? "ACTIVE" : "STANDBY",
-      status: will.in_grace ? "[TRIGGERED]" : "[NOT TRIGGERED]",
-      variant: (will.in_grace ? "destructive" : "warning") as const,
-    },
-  ];
+
 
   return (
     <DashboardPageLayout
@@ -203,9 +182,8 @@ export default function DashboardOverview() {
         <DashboardChart />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="mb-6">
         <RebelsRanking rebels={beneficiaries} />
-        <SecurityStatus statuses={securityStatuses} />
       </div>
     </DashboardPageLayout>
   );

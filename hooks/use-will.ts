@@ -59,6 +59,8 @@ export function useWillId() {
   );
 
   // Find the most recent will created by this account
+  console.log("Will events found:", data?.data?.length, "account:", account?.address);
+  data?.data?.forEach(e => console.log("event sender:", e.sender, "match:", e.sender === account?.address));
   const willEvent = data?.data?.find(
     (e) => e.sender === account?.address
   );
