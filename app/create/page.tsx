@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import DashboardPageLayout from "@/components/dashboard/layout";
@@ -40,6 +40,36 @@ export default function CreatePage() {
   const [message, setMessage] = useState("");
   const [txDigest, setTxDigest] = useState("");
   const [error, setError] = useState("");
+
+  // Load config from VIGIL AI if present
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const configParam = params.get("config");
+    if (!configParam) return;
+    try {
+      const config = JSON.parse(decodeURIComponent(configParam));
+      console.log("Parsed VIGIL config:", config);
+      if (config.beneficiaries?.length) {
+        setBeneficiaries(
+          config.beneficiaries.map((b: { address: string; share: number }, i: number) => ({
+            id: String(i + 1),
+            address: b.address,
+            share: b.share,
+          }))
+        );
+      }
+      if (config.timeoutDays) {
+        const ms = config.timeoutDays * 24 * 60 * 60 * 1000;
+        const closest = TIMEOUT_OPTIONS.reduce((prev, curr) =>
+          Math.abs(curr.value - ms) < Math.abs(prev.value - ms) ? curr : prev
+        );
+        setTimeoutMs(closest.value);
+      }
+      if (config.message) setMessage(config.message);
+    } catch {
+      console.error("Failed to parse VIGIL config from URL");
+    }
+  }, []);
 
   const totalShares = beneficiaries.reduce((sum, b) => sum + b.share, 0);
   const sharesValid = totalShares === 100;
