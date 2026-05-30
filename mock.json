@@ -262,10 +262,10 @@
     }
   ],
   "widgetData": {
-    "location": "Sui Mainnet",
+    "location": "Sui Testnet",
     "timezone": "UTC+0",
     "temperature": "ACTIVE",
     "weather": "Will Healthy",
-    "date": "Wednesday, June 10th, 2025"
+    "date": ""
   }
 }

@@ -29,8 +29,8 @@ export default function RebelsRanking({ rebels }: BeneficiariesProps) {
             <div className="flex items-center gap-3">
               <div className={`flex items-center justify-center rounded text-xs font-bold px-2 py-1 font-mono ${
                 b.featured
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-accent text-foreground"
+                  : "bg-accent text-muted-foreground"
               }`}>
                 {String(b.id).padStart(2, "0")}
               </div>
@@ -44,7 +44,7 @@ export default function RebelsRanking({ rebels }: BeneficiariesProps) {
                 )}
               </div>
             </div>
-            <Badge variant={b.featured ? "default" : "secondary"} className="font-mono text-xs">
+            <Badge variant="secondary" className="font-mono text-xs">
               {b.points}%
             </Badge>
           </div>

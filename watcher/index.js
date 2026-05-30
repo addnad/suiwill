@@ -6,7 +6,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 // ===== CONFIG =====
-const PACKAGE_ID = "0xbf03c8995a9e571b96815206bb6654aa43281db2347dc93813f33647f6f0ddba";
+const PACKAGE_ID = "0x10fb53945d9d120930af6a6b965c3f049cac49b310cede04d320dbe7d88e95bd";
 const CLOCK_ID = "0x6";
 const RPC_URL = "https://fullnode.testnet.sui.io:443";
 const CHECK_INTERVAL_MS = 60000;

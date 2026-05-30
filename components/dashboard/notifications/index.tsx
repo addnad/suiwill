@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useWillNotifications } from "@/hooks/use-will-notifications";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,8 +17,16 @@ interface NotificationsProps {
 export default function Notifications({
   initialNotifications,
 }: NotificationsProps) {
+  const { notifications: onchainNotifications, isLoading } = useWillNotifications();
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
+
+  // Use onchain notifications, show empty if none found
+  useEffect(() => {
+    if (!isLoading) {
+      setNotifications(onchainNotifications as unknown as Notification[]);
+    }
+  }, [onchainNotifications.length, isLoading]);
   const [showAll, setShowAll] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;

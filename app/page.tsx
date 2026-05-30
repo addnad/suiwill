@@ -135,12 +135,33 @@ function NoWalletState() {
     <DashboardPageLayout
       header={{ title: "Overview", description: "SuiWill Dashboard", icon: BracketsIcon }}
     >
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-4">
-        <h2 className="font-display text-4xl md:text-5xl tracking-widest uppercase">CONNECT WALLET</h2>
-        <p className="text-muted-foreground text-sm max-w-sm">
-          Connect your Sui wallet to view your will status, manage beneficiaries, and monitor your watcher agent.
-        </p>
-        <div className="w-48"><WalletButton /></div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8 text-center w-full max-w-lg mx-auto">
+        <div>
+          <h2 className="font-display text-[clamp(3rem,8vw,6rem)] leading-[0.88] tracking-tight uppercase mb-6">
+            YOUR WILL.<br />ONCHAIN.<br />FOREVER.
+          </h2>
+          <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mx-auto">
+            The trustless digital estate vault on Sui. If you stop signing, your will executes automatically. No lawyers. No custody. No trust required.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 items-center">
+          {[
+            "Set beneficiaries + percentage splits onchain",
+            "Store your final message permanently on Walrus",
+            "VIGIL AI agent monitors your wallet 24/7",
+            "7-day grace period before any execution",
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <span className="font-mono text-xs text-primary mt-0.5">0{i + 1}</span>
+              <span className="font-mono text-xs text-muted-foreground">{item}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="w-48">
+          <WalletButton />
+        </div>
       </div>
     </DashboardPageLayout>
   );
@@ -200,7 +221,7 @@ export default function DashboardOverview() {
       description: status === "grace"
         ? `${graceDaysRemaining} DAYS UNTIL EXECUTION`
         : status === "warning" ? "INACTIVITY WARNING" : "SUI TESTNET",
-      intent: status === "active" ? "positive" : status === "warning" ? "neutral" : "negative",
+      intent: "neutral",
       icon: "gear",
       direction: status === "active" ? "up" : "down",
       tag: status === "grace" ? "GRACE PERIOD" : undefined,

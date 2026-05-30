@@ -1,17 +1,15 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "motion/react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { motion } from "motion/react";
 import { useChatState } from "./use-chat-state";
-import ChatPreview from "./chat-preview";
-import ChatConversation from "./chat-conversation";
 import { ChatHeader } from "./chat-header";
-import { Button } from "@/components/ui/button";
-import PlusIcon from "../icons/plus";
 
-const CONTENT_HEIGHT = 420;
+const PANEL_HEIGHT = 500;
+const HEADER_HEIGHT = 56;
+const INPUT_HEIGHT = 60;
+const MESSAGES_HEIGHT = PANEL_HEIGHT - INPUT_HEIGHT;
 
 type Message = {
   id: string;
@@ -31,30 +29,37 @@ function sanitize(str: string): string {
 
 function VIGILChat() {
   const account = useCurrentAccount();
-  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "vigil",
-      content: account
-        ? "I am VIGIL. Describe your will in plain English and I will configure it for you. Example: leave 60% to 0x4f3a... and 40% to my brother 0x9d1b... trigger after 6 months"
-        : "Connect your Sui wallet to get started. I will help you configure your onchain will.",
-    },
+    { id: "welcome", role: "vigil", content: "Connect your Sui wallet to get started." },
   ]);
-  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
 
+  // Update welcome message when wallet connects
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (account) {
+      setMessages([{
+        id: "welcome",
+        role: "vigil",
+        content: `Wallet connected: ${account.address.slice(0, 8)}...${account.address.slice(-4)}. Describe your will in plain English. Example: leave 60% to 0x4f3a... and 40% to 0x9d1b... trigger after 6 months`,
+      }]);
+    }
+  }, [account?.address]);
+
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
+    const el = messagesRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, loading]);
 
   async function handleSend() {
-    if (!input.trim() || loading) return;
-    const cleanInput = input.trim().replace(/[\u2013\u2014\u2015]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[^\x00-\x7F]/g, "");
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content: cleanInput };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput("");
+    const raw = inputRef.current?.value ?? "";
+    if (!raw.trim() || loading) return;
+    const cleanInput = raw.trim().replace(/[\u2013\u2014]/g, "-").replace(/[^\x00-\x7F]/g, "");
+    if (inputRef.current) { inputRef.current.value = ""; inputRef.current.style.height = "auto"; }
+
+    setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: cleanInput }]);
     setLoading(true);
 
     try {
@@ -72,19 +77,19 @@ function VIGILChat() {
         setMessages((prev) => [...prev, {
           id: Date.now().toString(),
           role: "vigil",
-          content: sanitize(data.response || "I am here to help you configure your onchain will."),
+          content: sanitize(data.response || "I am here to help."),
         }]);
       } else if (data.success && data.type === "will" && data.will) {
         const will = data.will;
         will.beneficiaries = will.beneficiaries.map((b: { address: string; share: number }) => ({
-          ...b,
-          address: sanitize(b.address),
+          ...b, address: sanitize(b.address),
         }));
         if (will.message) will.message = sanitize(will.message);
         if (will.warnings) will.warnings = will.warnings.map(sanitize);
         const summary = [
           "WILL CONFIGURED:",
-          ...will.beneficiaries.map((b: { address: string; share: number }) => `- ${b.address.slice(0, 8)}...${b.address.slice(-4)} : ${b.share}%`),
+          ...will.beneficiaries.map((b: { address: string; share: number }) =>
+            `- ${b.address.slice(0, 8)}...${b.address.slice(-4)} : ${b.share}%`),
           `- Timeout: ${will.timeoutDays} days`,
           will.message ? `- Message: ${will.message.slice(0, 40)}...` : null,
           ...(will.warnings?.length ? [`! ${will.warnings.join(", ")}`] : []),
@@ -99,7 +104,7 @@ function VIGILChat() {
         setMessages((prev) => [...prev, {
           id: Date.now().toString(),
           role: "vigil",
-          content: data.error || "Something went wrong. Please try again.",
+          content: data.error || "Something went wrong.",
         }]);
       }
     } catch {
@@ -115,67 +120,105 @@ function VIGILChat() {
 
   function handleApply(willConfig: Message["willConfig"]) {
     if (!willConfig) return;
-    try {
-      const json = JSON.stringify(willConfig);
-      console.log("VIGIL applying config:", json);
-      const encoded = encodeURIComponent(json);
-      window.location.href = `/create?config=${encoded}`;
-    } catch (e) {
-      console.error("Failed to encode will config:", e);
-    }
+    window.open(`/create?config=${encodeURIComponent(JSON.stringify(willConfig))}`, "_blank");
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+    <div style={{ height: `${PANEL_HEIGHT}px`, display: "flex", flexDirection: "column", background: "var(--background)", borderTop: "1px solid var(--border)", overflow: "hidden" }}>
+
+      {/* Messages — fixed height, scrollable */}
+      <div
+        ref={messagesRef}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: "12px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          minHeight: 0,
+        }}
+      >
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === "user" ? "items-end" : "items-start"}`}>
-            <div className={`max-w-[85%] px-3 py-2 rounded-lg text-xs font-mono leading-relaxed whitespace-pre-wrap ${
-              msg.role === "user"
-                ? "bg-primary text-primary-foreground"
-                : "bg-accent text-foreground border border-border"
-            }`}>
+          <div key={msg.id} style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
+            <div style={{
+              maxWidth: "85%",
+              padding: "8px 12px",
+              borderRadius: "8px",
+              fontSize: "11px",
+              fontFamily: "var(--font-mono)",
+              lineHeight: 1.6,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              background: msg.role === "user" ? "var(--primary)" : "var(--accent)",
+              color: msg.role === "user" ? "var(--primary-foreground)" : "var(--foreground)",
+              border: msg.role === "vigil" ? "1px solid var(--border)" : "none",
+            }}>
               {msg.role === "vigil" && (
-                <span className="text-[9px] text-primary tracking-widest block mb-1">VIGIL</span>
+                <span style={{ fontSize: "9px", color: "var(--muted-foreground)", letterSpacing: "0.15em", display: "block", marginBottom: "4px" }}>VIGIL</span>
               )}
               {msg.content}
             </div>
             {msg.willConfig && (
               <button
                 onClick={() => handleApply(msg.willConfig)}
-                className="text-[9px] font-mono tracking-widest text-primary border border-primary px-3 py-1 hover:bg-primary hover:text-primary-foreground transition-colors rounded"
+                style={{ fontSize: "9px", fontFamily: "var(--font-mono)", letterSpacing: "0.15em", color: "var(--foreground)", border: "1px solid var(--border)", padding: "3px 10px", borderRadius: "4px", background: "transparent", cursor: "pointer" }}
               >
-                APPLY TO /CREATE →
+                APPLY TO /CREATE
               </button>
             )}
           </div>
         ))}
         {loading && (
-          <div className="flex items-start">
-            <div className="bg-accent border border-border px-3 py-2 rounded-lg">
-              <span className="text-[9px] text-primary tracking-widest block mb-1">VIGIL</span>
-              <span className="text-xs font-mono text-muted-foreground animate-pulse">thinking...</span>
+          <div style={{ display: "flex" }}>
+            <div style={{ background: "var(--accent)", border: "1px solid var(--border)", padding: "8px 12px", borderRadius: "8px" }}>
+              <span style={{ fontSize: "9px", color: "var(--muted-foreground)", display: "block", marginBottom: "4px" }}>VIGIL</span>
+              <span style={{ fontSize: "11px", fontFamily: "var(--font-mono)", color: "var(--muted-foreground)" }}>thinking...</span>
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="border-t border-border p-3 flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+      {/* Input — fixed at bottom */}
+      <div style={{ borderTop: "1px solid var(--border)", padding: "8px 12px", display: "flex", gap: "8px", alignItems: "flex-end", flexShrink: 0 }}>
+        <textarea
+          ref={inputRef}
+          defaultValue=""
+          rows={1}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          onInput={(e) => {
+            const el = e.currentTarget;
+            el.style.height = "auto";
+            el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+          }}
           placeholder="Describe your will..."
-          className="flex-1 bg-muted border border-border px-3 py-2 font-mono text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary transition-colors rounded-md"
+          style={{
+            flex: 1,
+            background: "var(--muted)",
+            border: "1px solid var(--border)",
+            borderRadius: "6px",
+            padding: "6px 10px",
+            fontFamily: "var(--font-mono)",
+            fontSize: "11px",
+            color: "var(--foreground)",
+            outline: "none",
+            resize: "none",
+            overflow: "auto",
+            lineHeight: "1.5",
+            minHeight: "32px",
+            maxHeight: "88px",
+          }}
         />
         <button
           onClick={handleSend}
-          disabled={loading || !input.trim()}
-          className="px-3 py-2 bg-primary text-primary-foreground font-mono text-xs hover:bg-primary/90 transition-colors disabled:opacity-50 rounded-md"
+          disabled={loading}
+          style={{ padding: "6px 12px", background: "var(--primary)", color: "var(--primary-foreground)", border: "none", borderRadius: "6px", fontFamily: "var(--font-mono)", fontSize: "11px", cursor: "pointer", opacity: loading ? 0.5 : 1 }}
         >
           →
         </button>
@@ -185,107 +228,23 @@ function VIGILChat() {
 }
 
 export default function Chat() {
-  const [activeTab, setActiveTab] = useState<"vigil" | "chat">("vigil");
-  const {
-    chatState,
-    conversations,
-    newMessage,
-    setNewMessage,
-    activeConversation,
-    handleSendMessage,
-    openConversation,
-    goBack,
-    toggleExpanded,
-  } = useChatState();
-
+  const { chatState, toggleExpanded, goBack } = useChatState();
   const isExpanded = chatState.state !== "collapsed";
 
   return (
     <motion.div
       className="absolute bottom-0 inset-x-0 z-50"
-      initial={{ y: CONTENT_HEIGHT }}
-      animate={{ y: isExpanded ? 0 : CONTENT_HEIGHT }}
+      initial={{ y: PANEL_HEIGHT }}
+      animate={{ y: isExpanded ? 0 : PANEL_HEIGHT }}
       transition={{ duration: 0.3, ease: "circInOut" }}
     >
       <ChatHeader
         variant="desktop"
         onClick={toggleExpanded}
-        showBackButton={chatState.state === "conversation"}
+        showBackButton={false}
         onBackClick={goBack}
       />
-
-      <div className="overflow-y-auto" style={{ height: CONTENT_HEIGHT }}>
-        <div className="bg-background text-foreground h-full flex flex-col">
-
-          {/* Tabs */}
-          <div className="flex border-b border-border shrink-0">
-            <button
-              onClick={() => setActiveTab("vigil")}
-              className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-colors ${
-                activeTab === "vigil"
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              VIGIL AI
-            </button>
-            <button
-              onClick={() => setActiveTab("chat")}
-              className={`flex-1 py-2 font-mono text-[10px] tracking-widest transition-colors ${
-                activeTab === "chat"
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              MESSAGES
-            </button>
-          </div>
-
-          {/* Tab content */}
-          <div className="flex-1 overflow-hidden">
-            {activeTab === "vigil" ? (
-              <VIGILChat />
-            ) : (
-              <AnimatePresence mode="wait">
-                {chatState.state === "expanded" && (
-                  <motion.div
-                    key="expanded"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="h-full flex flex-col overflow-y-auto"
-                  >
-                    {conversations.map((conversation) => (
-                      <ChatPreview
-                        key={conversation.id}
-                        conversation={conversation}
-                        onOpenConversation={openConversation}
-                      />
-                    ))}
-                    <div className="mt-auto flex justify-end p-4 sticky bottom-0 bg-gradient-to-t from-background via-background/80 to-black/0">
-                      <Button size="lg" variant="secondary" className="pl-0 py-0 gap-4 overflow-clip">
-                        <div className="bg-primary text-primary-foreground h-full aspect-square border-r-2 border-background flex items-center justify-center">
-                          <PlusIcon className="size-4" />
-                        </div>
-                        New Chat
-                      </Button>
-                    </div>
-                  </motion.div>
-                )}
-                {chatState.state === "conversation" && activeConversation && (
-                  <ChatConversation
-                    activeConversation={activeConversation}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    onSendMessage={handleSendMessage}
-                  />
-                )}
-              </AnimatePresence>
-            )}
-          </div>
-
-        </div>
-      </div>
+      <VIGILChat />
     </motion.div>
   );
 }

@@ -38,6 +38,7 @@ export default function CreatePage() {
   ]);
   const [timeoutMs, setTimeoutMs] = useState(180 * 24 * 60 * 60 * 1000);
   const [message, setMessage] = useState("");
+  const [depositSui, setDepositSui] = useState("0.1");
   const [txDigest, setTxDigest] = useState("");
   const [error, setError] = useState("");
 
@@ -115,6 +116,10 @@ export default function CreatePage() {
       const addresses = beneficiaries.map((b) => b.address);
       const shares = beneficiaries.map((b) => Math.round((b.share / 100) * 10000));
 
+      // Split deposit coin from gas
+      const depositMist = BigInt(Math.round(parseFloat(depositSui || "0") * 1_000_000_000));
+      const [depositCoin] = tx.splitCoins(tx.gas, [depositMist]);
+
       tx.moveCall({
         target: `${PACKAGE_ID}::will::create_will`,
         arguments: [
@@ -122,6 +127,7 @@ export default function CreatePage() {
           tx.pure.vector("u64", shares),
           tx.pure.u64(BigInt(timeoutMs)),
           tx.pure.vector("u8", blobIdBytes),
+          depositCoin,
           tx.object(CLOCK_ID),
         ],
       });
@@ -165,7 +171,7 @@ export default function CreatePage() {
       >
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-4">
           <div className="w-16 h-16 rounded-full bg-success/10 border border-success flex items-center justify-center">
-            <span className="text-success text-2xl">✓</span>
+            <span className="text-primary text-2xl">✓</span>
           </div>
           <div>
             <h2 className="font-display text-4xl tracking-widest uppercase mb-2">WILL DEPLOYED</h2>
@@ -228,7 +234,7 @@ export default function CreatePage() {
         ))}
       </div>
 
-      <div className="max-w-2xl">
+      <div className="w-full">
 
         {/* Step 1 — Beneficiaries */}
         {step === 1 && (
@@ -355,6 +361,31 @@ export default function CreatePage() {
               </p>
             </div>
 
+            {/* Deposit */}
+            <div className="border border-border rounded-lg p-6">
+              <p className="font-mono text-[10px] tracking-widest text-primary mb-2">VAULT DEPOSIT</p>
+              <p className="text-muted-foreground text-sm mb-4">
+                Deposit SUI into your will vault. These funds will be distributed to your beneficiaries when your will executes. You can add more later.
+              </p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value={depositSui}
+                  onChange={(e) => setDepositSui(e.target.value)}
+                  className="w-32 bg-muted border border-border px-3 py-2 font-mono text-xs text-foreground focus:outline-none focus:border-primary transition-colors rounded-md text-right"
+                />
+                <span className="font-mono text-xs text-muted-foreground">SUI</span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  = {(parseFloat(depositSui || "0") * 1_000_000_000).toLocaleString()} MIST
+                </span>
+              </div>
+              <p className="font-mono text-[9px] text-muted-foreground mt-2">
+                Minimum 0 SUI. You can deposit more anytime from My Will page.
+              </p>
+            </div>
+
             {/* Summary */}
             <div className="border border-border rounded-lg p-6">
               <p className="font-mono text-[10px] tracking-widest text-primary mb-4">WILL SUMMARY</p>
@@ -374,8 +405,12 @@ export default function CreatePage() {
                   <span className="font-mono text-[10px] text-foreground">{message.length > 0 ? "PROVIDED" : "SKIPPED"}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="font-mono text-[10px] text-muted-foreground">VAULT DEPOSIT</span>
+                  <span className="font-mono text-[10px] text-foreground">{depositSui} SUI</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="font-mono text-[10px] text-muted-foreground">NETWORK</span>
-                  <Badge variant="outline-success" className="font-mono text-[9px]">SUI TESTNET</Badge>
+                  <Badge variant="secondary" className="font-mono text-[9px]">SUI TESTNET</Badge>
                 </div>
               </div>
             </div>

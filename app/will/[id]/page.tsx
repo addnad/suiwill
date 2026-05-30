@@ -99,6 +99,23 @@ export default function WillPage() {
     });
   }
 
+  async function handleDeposit() {
+    const amount = prompt("Amount to deposit (SUI):");
+    if (!amount || isNaN(parseFloat(amount))) return;
+    setError(""); setTxMsg("");
+    const tx = new Transaction();
+    const depositMist = BigInt(Math.round(parseFloat(amount) * 1_000_000_000));
+    const [coin] = tx.splitCoins(tx.gas, [depositMist]);
+    tx.moveCall({
+      target: `${PACKAGE_ID}::will::deposit`,
+      arguments: [tx.object(id), coin],
+    });
+    signAndExecute({ transaction: tx }, {
+      onSuccess: (r) => { setTxMsg(`Deposited ${amount} SUI. Tx: ${r.digest.slice(0, 20)}...`); refetch(); },
+      onError: (e) => setError(e.message),
+    });
+  }
+
   async function handleCancelGrace() {
     setError(""); setTxMsg("");
     const tx = new Transaction();
@@ -120,19 +137,19 @@ export default function WillPage() {
         icon: ProcessorIcon,
       }}
     >
-      <div className="max-w-2xl flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
 
         <div className={`border rounded-lg p-6 flex items-center justify-between ${
-          status === "grace" ? "border-destructive bg-destructive/5" :
-          status === "warning" ? "border-warning bg-warning/5" :
-          "border-success bg-success/5"
+          status === "grace" ? "border-border bg-accent" :
+          status === "warning" ? "border-border bg-accent" :
+          "border-border bg-accent"
         }`}>
           <div>
             <p className="font-mono text-[10px] tracking-widest opacity-60 mb-1">WILL STATUS</p>
             <p className={`font-display text-4xl tracking-widest uppercase ${
-              status === "grace" ? "text-destructive" :
-              status === "warning" ? "text-warning" :
-              "text-success"
+              status === "grace" ? "text-foreground" :
+              status === "warning" ? "text-foreground" :
+              "text-foreground"
             }`}>
               {status === "grace" ? "GRACE PERIOD" : status === "warning" ? "WARNING" : "ACTIVE"}
             </p>
@@ -177,6 +194,7 @@ export default function WillPage() {
           <div className="flex flex-col gap-2">
             {[
               { label: "OBJECT ID", value: `${id.slice(0, 10)}...${id.slice(-8)}` },
+              { label: "VAULT BALANCE", value: `${(parseInt((fields.vault as { fields: { value: string } })?.fields?.value ?? "0") / 1_000_000_000).toFixed(4)} SUI` },
               { label: "TIMEOUT", value: `${timeoutMs / 86400000} days` },
               { label: "GRACE PERIOD", value: "7 days (fixed)" },
               { label: "WALRUS MESSAGE", value: walrusBlobId ? "STORED" : "NONE" },
@@ -203,6 +221,15 @@ export default function WillPage() {
                   {isPending ? "SIGNING..." : "RECORD HEARTBEAT"}
                 </button>
               )}
+              {!inGrace && (
+                <button
+                  onClick={handleDeposit}
+                  disabled={isPending}
+                  className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 rounded-md"
+                >
+                  {isPending ? "SIGNING..." : "DEPOSIT SUI TO VAULT"}
+                </button>
+              )}
               {inGrace && (
                 <button
                   onClick={handleCancelGrace}
@@ -221,7 +248,7 @@ export default function WillPage() {
                 VIEW ON SUI EXPLORER
               </a>
             </div>
-            {txMsg && <p className="font-mono text-[10px] text-success mt-3">{txMsg}</p>}
+            {txMsg && <p className="font-mono text-[10px] text-chart-2 mt-3">{txMsg}</p>}
             {error && <p className="font-mono text-[10px] text-destructive mt-3">{error}</p>}
           </div>
         )}

@@ -59,11 +59,10 @@ export default function Widget({ widgetData }: WidgetProps) {
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="opacity-50">{widgetData.temperature}</span>
-          <span>{widgetData.location}</span>
-
+          <span className="opacity-50">SUIWILL</span>
+          <span>Sui Testnet</span>
           <Badge variant="secondary" className="bg-accent">
-            {widgetData.timezone}
+            ACTIVE
           </Badge>
         </div>
 

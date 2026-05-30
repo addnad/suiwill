@@ -9,8 +9,8 @@ SuiWill is a trustless digital estate vault on Sui. If you stop signing transact
 ## Live Demo
 
 - **Contract (Sui Testnet):** `0xbf03c8995a9e571b96815206bb6654aa43281db2347dc93813f33647f6f0ddba`
-- **Example Will:** https://suiscan.xyz/testnet/object/0xc0a6f9d2a153e99081c01d68de481aac14be8b75cb53480b1e49396613ca02ec
-- **Example Tx:** https://suiscan.xyz/testnet/tx/CjGJTTtFJJni2A7KW5nd7iahqQNVurDDQ8bVxTuG5TXU
+- **Example Will:** https://suiscan.xyz/testnet/object/0x6320e97ab04df18cb51bc6eef312a9b4dae3abd3189dc2658a02da4cd68d75af
+- **Example Tx:** https://suiscan.xyz/testnet/tx/8PDQettYSYn1rhctnNNxdyES3aqVGT8r2iDLZ9T2PqZa
 
 ---
 
@@ -57,6 +57,18 @@ SuiWill is a trustless digital estate vault on Sui. If you stop signing transact
 
 ---
 
+## How the Vault Works
+
+When you create a SuiWill, you deposit SUI directly into the contract vault at creation time. Your assets are held inside the Move object — not on any server, not in a multisig, not in a custodian. The contract itself holds the balance via `Balance<SUI>`.
+
+- **Deposit at creation** — set an initial amount when deploying
+- **Top up anytime** — call `deposit()` to add more SUI to the vault
+- **Withdraw anytime** — call `withdraw()` to reclaim funds (only when not in grace period)
+- **Automatic distribution** — when `execute_will()` fires, the vault balance is split atomically to all beneficiaries according to their percentage shares
+- **Dust handling** — any rounding remainder goes to the last beneficiary
+
+This is the correct trustless pattern. No one can touch the vault except the contract logic itself.
+
 ## Tracks
 
 - **Agentic Web** — VIGIL AI agent parses natural language will configuration using Claude Sonnet via OpenRouter. The watcher agent autonomously monitors all SuiWill contracts and triggers grace periods on inactivity.
@@ -66,7 +78,7 @@ SuiWill is a trustless digital estate vault on Sui. If you stop signing transact
 
 ## Contract
 
-**Package ID:** `0xbf03c8995a9e571b96815206bb6654aa43281db2347dc93813f33647f6f0ddba`  
+**Package ID:** `0x10fb53945d9d120930af6a6b965c3f049cac49b310cede04d320dbe7d88e95bd`  
 **Network:** Sui Testnet  
 **Module:** `will`
 
@@ -74,11 +86,13 @@ SuiWill is a trustless digital estate vault on Sui. If you stop signing transact
 
 | Function | Description |
 |---|---|
-| `create_will` | Deploy a new SuiWill shared object |
+| `create_will` | Deploy a new SuiWill shared object with initial vault deposit |
+| `deposit` | Add SUI to the vault (owner only) |
+| `withdraw` | Withdraw SUI from vault (owner only, not in grace) |
 | `heartbeat` | Reset inactivity clock (owner only) |
 | `trigger_grace` | Trigger 7-day grace period (anyone, after timeout) |
 | `cancel_grace` | Cancel grace period (owner only) |
-| `execute_will` | Distribute assets to beneficiaries (anyone, after grace) |
+| `execute_will` | Distribute vault balance to beneficiaries (anyone, after grace) |
 
 ---
 
