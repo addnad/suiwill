@@ -291,6 +291,37 @@ module suiwill::will {
         will.walrus_blob_id = new_blob_id;
     }
 
+    /// Close will — withdraw all funds and deactivate (owner only, not in grace)
+    public fun close_will(
+        will: SuiWill,
+        ctx: &mut TxContext,
+    ) {
+        assert!(will.owner == ctx.sender(), ENotOwner);
+        assert!(!will.in_grace, EInGrace);
+
+        let SuiWill {
+            id,
+            owner: _,
+            beneficiaries: _,
+            last_seen_ms: _,
+            timeout_ms: _,
+            walrus_blob_id: _,
+            in_grace: _,
+            grace_start_ms: _,
+            vault,
+        } = will;
+
+        // Return remaining vault balance to owner
+        if (balance::value(&vault) > 0) {
+            let coin = coin::from_balance(vault, ctx);
+            transfer::public_transfer(coin, ctx.sender());
+        } else {
+            balance::destroy_zero(vault);
+        };
+
+        object::delete(id);
+    }
+
     // ===== View Functions =====
     public fun owner(will: &SuiWill): address { will.owner }
     public fun last_seen_ms(will: &SuiWill): u64 { will.last_seen_ms }

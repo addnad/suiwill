@@ -120,7 +120,7 @@ function VIGILChat() {
 
   function handleApply(willConfig: Message["willConfig"]) {
     if (!willConfig) return;
-    window.open(`/create?config=${encodeURIComponent(JSON.stringify(willConfig))}`, "_blank");
+    window.location.href = `/create?config=${encodeURIComponent(JSON.stringify(willConfig))}`;
   }
 
   return (

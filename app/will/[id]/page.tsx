@@ -25,6 +25,8 @@ export default function WillPage() {
   const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
   const [txMsg, setTxMsg] = useState("");
   const [error, setError] = useState("");
+  const [depositAmount, setDepositAmount] = useState("0.1");
+  const [showDeposit, setShowDeposit] = useState(false);
 
   const { data, isLoading, refetch } = useSuiClientQuery(
     "getObject",
@@ -99,19 +101,33 @@ export default function WillPage() {
     });
   }
 
+  async function handleWithdrawAll() {
+    setError(""); setTxMsg("");
+    const vaultBalance = parseInt(fields?.vault as string ?? "0");
+    if (vaultBalance === 0) { setError("Vault is empty"); return; }
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${PACKAGE_ID}::will::withdraw`,
+      arguments: [tx.object(id), tx.pure.u64(BigInt(vaultBalance))],
+    });
+    signAndExecute({ transaction: tx }, {
+      onSuccess: (r) => { setTxMsg(`Withdrew ${(vaultBalance/1_000_000_000).toFixed(4)} SUI. Tx: ${r.digest.slice(0, 20)}...`); refetch(); },
+      onError: (e) => setError(e.message),
+    });
+  }
+
   async function handleDeposit() {
-    const amount = prompt("Amount to deposit (SUI):");
-    if (!amount || isNaN(parseFloat(amount))) return;
+    if (!depositAmount || isNaN(parseFloat(depositAmount))) return;
     setError(""); setTxMsg("");
     const tx = new Transaction();
-    const depositMist = BigInt(Math.round(parseFloat(amount) * 1_000_000_000));
+    const depositMist = BigInt(Math.round(parseFloat(depositAmount) * 1_000_000_000));
     const [coin] = tx.splitCoins(tx.gas, [depositMist]);
     tx.moveCall({
       target: `${PACKAGE_ID}::will::deposit`,
       arguments: [tx.object(id), coin],
     });
     signAndExecute({ transaction: tx }, {
-      onSuccess: (r) => { setTxMsg(`Deposited ${amount} SUI. Tx: ${r.digest.slice(0, 20)}...`); refetch(); },
+      onSuccess: (r) => { setTxMsg(`Deposited ${depositAmount} SUI. Tx: ${r.digest.slice(0, 20)}...`); refetch(); setShowDeposit(false); },
       onError: (e) => setError(e.message),
     });
   }
@@ -160,7 +176,7 @@ export default function WillPage() {
         </div>
 
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">
+          <p className="font-mono text-xs tracking-widest text-muted-foreground mb-2">
             {status === "grace" ? "TIME UNTIL EXECUTION" : "TIME UNTIL TRIGGER"}
           </p>
           <p className="font-display text-5xl md:text-6xl tracking-widest">
@@ -174,7 +190,7 @@ export default function WillPage() {
         </div>
 
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">BENEFICIARIES</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">BENEFICIARIES</p>
           <div className="flex flex-col gap-2">
             {beneficiaries.map((b, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-b-0">
@@ -190,11 +206,11 @@ export default function WillPage() {
         </div>
 
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">CONTRACT DETAILS</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">CONTRACT DETAILS</p>
           <div className="flex flex-col gap-2">
             {[
               { label: "OBJECT ID", value: `${id.slice(0, 10)}...${id.slice(-8)}` },
-              { label: "VAULT BALANCE", value: `${(parseInt((fields.vault as { fields: { value: string } })?.fields?.value ?? "0") / 1_000_000_000).toFixed(4)} SUI` },
+              { label: "VAULT BALANCE", value: `${(parseInt(fields.vault as string ?? "0") / 1_000_000_000).toFixed(4)} SUI` },
               { label: "TIMEOUT", value: `${timeoutMs / 86400000} days` },
               { label: "GRACE PERIOD", value: "7 days (fixed)" },
               { label: "WALRUS MESSAGE", value: walrusBlobId ? "STORED" : "NONE" },
@@ -210,7 +226,7 @@ export default function WillPage() {
 
         {isOwner && (
           <div className="border border-border rounded-lg p-6">
-            <p className="font-mono text-[10px] tracking-widest text-primary mb-4">ACTIONS</p>
+            <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">ACTIONS</p>
             <div className="flex flex-col gap-3">
               {!inGrace && (
                 <button
@@ -221,13 +237,52 @@ export default function WillPage() {
                   {isPending ? "SIGNING..." : "RECORD HEARTBEAT"}
                 </button>
               )}
-              {!inGrace && (
+              {!inGrace && !showDeposit && (
                 <button
-                  onClick={handleDeposit}
-                  disabled={isPending}
-                  className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 rounded-md"
+                  onClick={() => setShowDeposit(true)}
+                  className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-primary hover:text-primary transition-colors rounded-md"
                 >
-                  {isPending ? "SIGNING..." : "DEPOSIT SUI TO VAULT"}
+                  ADD TO VAULT
+                </button>
+              )}
+              {!inGrace && showDeposit && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={depositAmount}
+                      onChange={(e) => setDepositAmount(e.target.value)}
+                      className="flex-1 bg-muted border border-border px-3 py-2 font-mono text-xs text-foreground focus:outline-none focus:border-primary transition-colors rounded-md"
+                      placeholder="Amount in SUI"
+                    />
+                    <span className="font-mono text-xs text-muted-foreground">SUI</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowDeposit(false)}
+                      className="flex-1 font-mono text-xs tracking-widest border border-border py-2 hover:border-primary transition-colors rounded-md"
+                    >
+                      CANCEL
+                    </button>
+                    <button
+                      onClick={handleDeposit}
+                      disabled={isPending}
+                      className="flex-1 font-mono text-xs tracking-widest bg-primary text-primary-foreground py-2 hover:bg-primary/90 transition-colors disabled:opacity-50 rounded-md"
+                    >
+                      {isPending ? "SIGNING..." : "CONFIRM DEPOSIT"}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {!inGrace && parseInt(fields?.vault as string ?? "0") > 0 && (
+                <button
+                  onClick={handleWithdrawAll}
+                  disabled={isPending}
+                  className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-destructive hover:text-destructive transition-colors disabled:opacity-50 rounded-md"
+                >
+                  {isPending ? "SIGNING..." : "WITHDRAW ALL FROM VAULT"}
                 </button>
               )}
               {inGrace && (

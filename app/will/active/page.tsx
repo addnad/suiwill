@@ -25,7 +25,7 @@ export default function WillActivePage() {
         header={{ title: "My Will", description: "Connect wallet", icon: ProcessorIcon }}
       >
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center">
-          <h2 className="font-display text-4xl tracking-widest uppercase">CONNECT WALLET</h2>
+          <h2 className="font-display text-4xl md:text-5xl tracking-widest uppercase">CONNECT WALLET</h2>
           <div className="w-48"><WalletButton /></div>
         </div>
       </DashboardPageLayout>
@@ -52,7 +52,7 @@ export default function WillActivePage() {
         header={{ title: "My Will", description: "No will found", icon: ProcessorIcon }}
       >
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-4">
-          <h2 className="font-display text-4xl tracking-widest uppercase">NO WILL FOUND</h2>
+          <h2 className="font-display text-4xl md:text-5xl tracking-widest uppercase">NO WILL FOUND</h2>
           <p className="text-muted-foreground text-sm max-w-sm">
             You have not deployed a SuiWill contract yet.
           </p>

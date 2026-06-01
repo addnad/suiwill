@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import BracketsIcon from "@/components/icons/brackets";
+import SuiWillIcon from "@/components/icons/suiwill";
 import ProcessorIcon from "@/components/icons/proccesor";
 import CuteRobotIcon from "@/components/icons/cute-robot";
 import GearIcon from "@/components/icons/gear";
@@ -85,7 +86,7 @@ export function DashboardSidebar({
     <Sidebar {...props} className={cn("py-sides", className)}>
       <SidebarHeader className="rounded-t-lg flex gap-3 flex-row rounded-b-none">
         <div className="flex overflow-clip size-12 shrink-0 items-center justify-center rounded bg-sidebar-primary-foreground/10 text-sidebar-primary-foreground">
-          <VIGILIcon className="size-8" />
+          <SuiWillIcon className="size-8" />
         </div>
         <div className="grid flex-1 text-left text-sm leading-tight">
           <span className="text-2xl font-display tracking-widest">SUIWILL</span>

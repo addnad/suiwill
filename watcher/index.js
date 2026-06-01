@@ -6,9 +6,10 @@ import * as fs from "fs";
 import * as path from "path";
 
 // ===== CONFIG =====
-const PACKAGE_ID = "0x10fb53945d9d120930af6a6b965c3f049cac49b310cede04d320dbe7d88e95bd";
+const PACKAGE_ID = "0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2";
 const CLOCK_ID = "0x6";
-const RPC_URL = "https://fullnode.testnet.sui.io:443";
+const TATUM_KEY = "t-65a7c7b760fded001ccd19d3-de68f6cb571143d58ea5c811";
+const RPC_URL = "https://sui-testnet.gateway.tatum.io";
 const CHECK_INTERVAL_MS = 60000;
 
 // Load keypair from Sui CLI keystore

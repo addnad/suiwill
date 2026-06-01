@@ -78,7 +78,7 @@ This is the correct trustless pattern. No one can touch the vault except the con
 
 ## Contract
 
-**Package ID:** `0x10fb53945d9d120930af6a6b965c3f049cac49b310cede04d320dbe7d88e95bd`  
+**Package ID:** `0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2`  
 **Network:** Sui Testnet  
 **Module:** `will`
 

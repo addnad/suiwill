@@ -68,7 +68,7 @@ export default function WatcherPage() {
 
         {/* Agent specs */}
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">AGENT CONFIGURATION</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">AGENT CONFIGURATION</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: "CHECK INTERVAL", value: "60s" },
@@ -98,7 +98,7 @@ export default function WatcherPage() {
           ) : (
             <div className="flex flex-col gap-2">
               {willIds.map((id) => (
-                <WillRow key={id} willId={id} now={now} account={account.address} />
+                <WillRow key={id} willId={id} now={now} account={account?.address ?? ""} />
               ))}
             </div>
           )}
@@ -106,7 +106,7 @@ export default function WatcherPage() {
 
         {/* How to run */}
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">RUN THE WATCHER LOCALLY</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">RUN THE WATCHER LOCALLY</p>
           <div className="bg-muted rounded-lg p-4 font-mono text-xs text-muted-foreground leading-relaxed">
             <p className="text-success mb-1"># Install and run the VIGIL watcher agent</p>
             <p>cd watcher</p>

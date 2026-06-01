@@ -55,7 +55,7 @@ Network: ${context.network}`
       : "";
 
     const response = await client.chat.completions.create({
-      model: "anthropic/claude-sonnet-4-5",
+      model: "openrouter/auto",
       max_tokens: 1000,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },

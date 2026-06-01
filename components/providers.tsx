@@ -6,9 +6,11 @@ import "@mysten/dapp-kit/dist/index.css";
 
 const queryClient = new QueryClient();
 
+const TATUM_KEY = "t-65a7c7b760fded001ccd19d3-de68f6cb571143d58ea5c811";
+
 const { networkConfig } = createNetworkConfig({
-  mainnet: { url: "https://fullnode.mainnet.sui.io:443" },
-  testnet: { url: "https://fullnode.testnet.sui.io:443" },
+  mainnet: { url: `https://sui-mainnet.gateway.tatum.io/${TATUM_KEY}` },
+  testnet: { url: `https://sui-testnet.gateway.tatum.io/${TATUM_KEY}` },
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {

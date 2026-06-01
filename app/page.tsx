@@ -48,7 +48,7 @@ function LandingPage() {
           <h1 className="font-display text-[clamp(4rem,10vw,8rem)] leading-[0.88] tracking-tight text-foreground uppercase mb-6">
             SUI<br />WILL
           </h1>
-          <p className="font-sans text-base text-muted-foreground leading-relaxed mb-8 max-w-sm">
+          <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
             The trustless digital estate vault on Sui. If you stop signing, your will executes automatically. No lawyers. No custody. No trust required.
           </p>
 

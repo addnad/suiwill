@@ -155,7 +155,7 @@ export default function CreatePage() {
         header={{ title: "Create Will", description: "Deploy your SuiWill contract", icon: ProcessorIcon }}
       >
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center">
-          <h2 className="font-display text-4xl tracking-widest uppercase">CONNECT WALLET</h2>
+          <h2 className="font-display text-4xl md:text-5xl tracking-widest uppercase">CONNECT WALLET</h2>
           <p className="text-muted-foreground text-sm max-w-sm">Connect your Sui wallet to deploy your will.</p>
           <div className="w-48"><WalletButton /></div>
         </div>
@@ -240,7 +240,7 @@ export default function CreatePage() {
         {step === 1 && (
           <div className="flex flex-col gap-4">
             <div className="border border-border rounded-lg p-6">
-              <p className="font-mono text-[10px] tracking-widest text-primary mb-4">BENEFICIARY ADDRESSES</p>
+              <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">BENEFICIARY ADDRESSES</p>
               <div className="flex flex-col gap-3">
                 {beneficiaries.map((b) => (
                   <div key={b.id} className="flex gap-2 items-start">
@@ -296,7 +296,7 @@ export default function CreatePage() {
         {step === 2 && (
           <div className="flex flex-col gap-4">
             <div className="border border-border rounded-lg p-6">
-              <p className="font-mono text-[10px] tracking-widest text-primary mb-2">INACTIVITY TIMEOUT</p>
+              <p className="font-mono text-xs tracking-widest text-primary mb-2 uppercase">INACTIVITY TIMEOUT</p>
               <p className="text-muted-foreground text-sm mb-6">
                 If no signed transaction is detected on Sui for this period, your will enters a 7-day grace period.
               </p>
@@ -345,7 +345,7 @@ export default function CreatePage() {
         {step === 3 && (
           <div className="flex flex-col gap-4">
             <div className="border border-border rounded-lg p-6">
-              <p className="font-mono text-[10px] tracking-widest text-primary mb-2">FINAL MESSAGE</p>
+              <p className="font-mono text-xs tracking-widest text-primary mb-2 uppercase">FINAL MESSAGE</p>
               <p className="text-muted-foreground text-sm mb-4">
                 Write a message to your beneficiaries. Stored on Walrus — immutable and only readable after execution.
               </p>
@@ -363,7 +363,7 @@ export default function CreatePage() {
 
             {/* Deposit */}
             <div className="border border-border rounded-lg p-6">
-              <p className="font-mono text-[10px] tracking-widest text-primary mb-2">VAULT DEPOSIT</p>
+              <p className="font-mono text-xs tracking-widest text-primary mb-2 uppercase">VAULT DEPOSIT</p>
               <p className="text-muted-foreground text-sm mb-4">
                 Deposit SUI into your will vault. These funds will be distributed to your beneficiaries when your will executes. You can add more later.
               </p>
@@ -388,7 +388,7 @@ export default function CreatePage() {
 
             {/* Summary */}
             <div className="border border-border rounded-lg p-6">
-              <p className="font-mono text-[10px] tracking-widest text-primary mb-4">WILL SUMMARY</p>
+              <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">WILL SUMMARY</p>
               <div className="flex flex-col gap-2">
                 {beneficiaries.map((b, i) => (
                   <div key={b.id} className="flex justify-between">

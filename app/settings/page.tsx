@@ -35,7 +35,7 @@ export default function SettingsPage() {
 
         {/* Wallet */}
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">CONNECTED WALLET</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">CONNECTED WALLET</p>
           <div className="flex flex-col gap-3">
             {[
               { label: "ADDRESS", value: account?.address ?? "Not connected", mono: true },
@@ -58,7 +58,7 @@ export default function SettingsPage() {
 
         {/* Will */}
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">SUIWILL CONTRACT</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">SUIWILL CONTRACT</p>
           <div className="flex flex-col gap-3">
             {[
               { label: "PACKAGE ID", value: PACKAGE_ID },
@@ -94,7 +94,7 @@ export default function SettingsPage() {
 
         {/* About */}
         <div className="border border-border rounded-lg p-6">
-          <p className="font-mono text-[10px] tracking-widest text-primary mb-4">ABOUT SUIWILL</p>
+          <p className="font-mono text-xs tracking-widest text-primary mb-4 uppercase">ABOUT SUIWILL</p>
           <div className="flex flex-col gap-3">
             {[
               { label: "VERSION", value: "1.0.0" },
