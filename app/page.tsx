@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useNetwork } from "@/components/providers";
 import { useWill } from "@/hooks/use-will";
 import DashboardPageLayout from "@/components/dashboard/layout";
 import DashboardStat from "@/components/dashboard/stat";
@@ -38,8 +39,6 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-
-      {/* LEFT — Brand */}
       <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 py-16 lg:py-0">
         <div className="max-w-lg">
           <p className="font-mono text-[11px] tracking-[0.2em] text-primary mb-4 uppercase">
@@ -51,7 +50,6 @@ function LandingPage() {
           <p className="font-mono text-sm text-muted-foreground leading-relaxed mb-8 max-w-sm">
             The trustless digital estate vault on Sui. If you stop signing, your will executes automatically. No lawyers. No custody. No trust required.
           </p>
-
           <div className="flex flex-col gap-3 mb-10">
             {[
               "Configure beneficiaries + percentage splits",
@@ -64,24 +62,19 @@ function LandingPage() {
               </div>
             ))}
           </div>
-
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="w-48">
               <WalletButton />
             </div>
             <a
-              href={`https://suiscan.xyz/testnet/object/${DEMO_WILL_ID}`}
+              href={`https://suiscan.xyz/${network}/object/${DEMO_WILL_ID}`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 border border-border font-mono text-xs tracking-widest text-muted-foreground hover:border-primary hover:text-primary transition-colors rounded-md text-center"
-            >
-              VIEW CONTRACT ↗
-            </a>
+            >VIEW CONTRACT</a>
           </div>
         </div>
       </div>
-
-      {/* RIGHT — Live demo will widget */}
       <div className="lg:w-[420px] shrink-0 border-t lg:border-t-0 lg:border-l border-border flex flex-col justify-center px-8 py-12 gap-6 bg-card">
         <div>
           <p className="font-mono text-[10px] tracking-[0.2em] text-primary mb-1">LIVE DEMO WILL</p>
@@ -89,16 +82,12 @@ function LandingPage() {
             {DEMO_WILL_ID.slice(0, 10)}...{DEMO_WILL_ID.slice(-6)} · Sui Testnet
           </p>
         </div>
-
-        {/* Countdown */}
         <div className="border border-border rounded-lg p-6 bg-background">
           <p className="font-mono text-[10px] tracking-widest text-muted-foreground mb-2">TIME UNTIL TRIGGER</p>
           <p className="font-display text-4xl tracking-widest text-foreground">
             {fields ? msToCountdown(msUntilTrigger) : "——"}
           </p>
         </div>
-
-        {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
           {[
             { label: "STATUS", value: fields ? "ACTIVE" : "—", color: "text-success" },
@@ -112,8 +101,6 @@ function LandingPage() {
             </div>
           ))}
         </div>
-
-        {/* Tech stack */}
         <div className="border border-border rounded-lg p-4 bg-background">
           <p className="font-mono text-[9px] tracking-widest text-muted-foreground mb-3">BUILT WITH</p>
           <div className="flex flex-wrap gap-2">
@@ -125,7 +112,6 @@ function LandingPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -144,7 +130,6 @@ function NoWalletState() {
             The trustless digital estate vault on Sui. If you stop signing, your will executes automatically. No lawyers. No custody. No trust required.
           </p>
         </div>
-
         <div className="flex flex-col gap-3 items-center">
           {[
             "Set beneficiaries + percentage splits onchain",
@@ -158,7 +143,6 @@ function NoWalletState() {
             </div>
           ))}
         </div>
-
         <div className="w-48">
           <WalletButton />
         </div>
@@ -188,9 +172,7 @@ function NoWillState() {
         <a
           href="/create"
           className="px-6 py-3 bg-primary text-primary-foreground font-mono text-xs tracking-widest uppercase hover:bg-primary/90 transition-colors rounded-md"
-        >
-          CREATE YOUR WILL
-        </a>
+        >CREATE YOUR WILL</a>
       </div>
     </DashboardPageLayout>
   );
@@ -198,6 +180,7 @@ function NoWillState() {
 
 export default function DashboardOverview() {
   const account = useCurrentAccount();
+  const { network } = useNetwork();
   const { will, isLoading, daysUntilTrigger, lastSeenDaysAgo, graceDaysRemaining, status } = useWill();
 
   if (!account) return <NoWalletState />;
@@ -220,7 +203,7 @@ export default function DashboardOverview() {
       value: status === "grace" ? "GRACE" : status === "warning" ? "WARNING" : "ACTIVE",
       description: status === "grace"
         ? `${graceDaysRemaining} DAYS UNTIL EXECUTION`
-        : status === "warning" ? "INACTIVITY WARNING" : "SUI TESTNET",
+        : status === "warning" ? "INACTIVITY WARNING" : network === "mainnet" ? "SUI MAINNET" : "SUI TESTNET",
       intent: "neutral",
       icon: "gear",
       direction: status === "active" ? "up" : "down",
@@ -257,7 +240,7 @@ export default function DashboardOverview() {
     <DashboardPageLayout
       header={{
         title: "Overview",
-        description: `${account.address.slice(0, 6)}...${account.address.slice(-4)} · Sui Testnet`,
+        description: `${account.address.slice(0, 6)}...${account.address.slice(-4)} · Sui ${network.charAt(0).toUpperCase() + network.slice(1)}`,
         icon: BracketsIcon,
       }}
     >

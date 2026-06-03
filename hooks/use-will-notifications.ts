@@ -1,8 +1,9 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
 
 export type WillNotification = {
   id: string;
@@ -20,7 +21,7 @@ function getEventNotification(event: {
   parsedJson: unknown;
   timestampMs?: string;
   sender: string;
-}, account: string): WillNotification | null {
+}, account: string, network: string): WillNotification | null {
   const parsed = event.parsedJson as Record<string, string>;
   const ts = event.timestampMs
     ? new Date(parseInt(event.timestampMs)).toISOString()
@@ -31,7 +32,7 @@ function getEventNotification(event: {
     return {
       id,
       title: "WILL DEPLOYED",
-      message: `Your SuiWill contract is live on Sui testnet. VIGIL watcher agent is now monitoring your wallet activity.`,
+      message: `Your SuiWill contract is live on Sui ${network}. VIGIL watcher agent is now monitoring your wallet activity.`,
       timestamp: ts,
       type: "success",
       read: false,
@@ -91,6 +92,7 @@ function getEventNotification(event: {
 }
 
 export function useWillNotifications() {
+  const { packageId: PACKAGE_ID, network } = useNetwork();
   const account = useCurrentAccount();
 
   const eventTypes = [
@@ -116,7 +118,7 @@ export function useWillNotifications() {
   const allEvents = results.flatMap((r) => r.data?.data ?? []);
 
   const notifications: WillNotification[] = allEvents
-    .map((e) => getEventNotification(e as Parameters<typeof getEventNotification>[0], account?.address ?? ""))
+    .map((e) => getEventNotification(e as Parameters<typeof getEventNotification>[0], account?.address ?? "", network))
     .filter((n): n is WillNotification => n !== null)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 

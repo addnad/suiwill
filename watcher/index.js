@@ -6,11 +6,20 @@ import * as fs from "fs";
 import * as path from "path";
 
 // ===== CONFIG =====
-const PACKAGE_ID = "0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2";
+const NETWORK = process.env.WATCHER_NETWORK ?? "testnet";
+const PACKAGE_IDS = {
+  testnet: "0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2",
+  mainnet: "0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae",
+};
+const RPC_URLS = {
+  testnet: "https://fullnode.testnet.sui.io:443",
+  mainnet: "https://fullnode.mainnet.sui.io:443",
+};
+const PACKAGE_ID = PACKAGE_IDS[NETWORK];
 const CLOCK_ID = "0x6";
-const TATUM_KEY = "t-65a7c7b760fded001ccd19d3-de68f6cb571143d58ea5c811";
-const RPC_URL = "https://sui-testnet.gateway.tatum.io";
+const RPC_URL = RPC_URLS[NETWORK];
 const CHECK_INTERVAL_MS = 60000;
+console.log(`VIGIL watcher starting on ${NETWORK} — package ${PACKAGE_ID}`);
 
 // Load keypair from Sui CLI keystore
 function loadKeypair() {

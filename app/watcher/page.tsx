@@ -1,12 +1,13 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import { useState, useEffect } from "react";
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 import DashboardPageLayout from "@/components/dashboard/layout";
 import CuteRobotIcon from "@/components/icons/cute-robot";
 import { Badge } from "@/components/ui/badge";
 
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
 
 function msToCountdown(ms: number) {
   if (ms <= 0) return "00d 00h 00m";
@@ -17,6 +18,7 @@ function msToCountdown(ms: number) {
 }
 
 export default function WatcherPage() {
+  const { packageId: PACKAGE_ID, network } = useNetwork();
   const account = useCurrentAccount();
   const [now, setNow] = useState(Date.now());
 
@@ -62,7 +64,7 @@ export default function WatcherPage() {
               <span className="w-2 h-2 rounded-full bg-chart-2 animate-pulse" />
               <span className="font-mono text-[10px] text-success tracking-widest">ONLINE</span>
             </div>
-            <Badge variant="secondary">Sui Testnet</Badge>
+            <Badge variant="secondary">Sui {network.charAt(0).toUpperCase() + network.slice(1)}</Badge>
           </div>
         </div>
 
@@ -73,7 +75,7 @@ export default function WatcherPage() {
             {[
               { label: "CHECK INTERVAL", value: "60s" },
               { label: "GRACE PERIOD", value: "7 days" },
-              { label: "NETWORK", value: "Testnet" },
+              { label: "NETWORK", value: network.charAt(0).toUpperCase() + network.slice(1) },
               { label: "RUNTIME", value: "Node.js" },
             ].map((s) => (
               <div key={s.label} className="border border-border rounded-lg p-4">
@@ -94,7 +96,7 @@ export default function WatcherPage() {
           {isLoading ? (
             <p className="font-mono text-xs text-muted-foreground animate-pulse">QUERYING CHAIN...</p>
           ) : willIds.length === 0 ? (
-            <p className="font-mono text-xs text-muted-foreground">No wills found on testnet</p>
+            <p className="font-mono text-xs text-muted-foreground">No wills found on {network}</p>
           ) : (
             <div className="flex flex-col gap-2">
               {willIds.map((id) => (

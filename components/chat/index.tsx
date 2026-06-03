@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { useNetwork } from "@/components/providers";
 import { motion } from "motion/react";
 import { useChatState } from "./use-chat-state";
 import { ChatHeader } from "./chat-header";
@@ -68,7 +69,7 @@ function VIGILChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userMessage: cleanInput,
-          context: account ? { address: account.address, network: "testnet" } : null,
+          context: account ? { address: account.address, network: network } : null,
         }),
       });
       const data = await res.json();
@@ -228,6 +229,7 @@ function VIGILChat() {
 }
 
 export default function Chat() {
+  const { network } = useNetwork();
   const { chatState, toggleExpanded, goBack } = useChatState();
   const isExpanded = chatState.state !== "collapsed";
 

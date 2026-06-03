@@ -2,8 +2,7 @@
 
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 import { SuiObjectData } from "@mysten/sui/client";
-
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
+import { useNetwork } from "@/components/providers";
 
 export type WillData = {
   id: string;
@@ -43,22 +42,21 @@ export function parseWillObject(obj: SuiObjectData): WillData | null {
 
 export function useWillId() {
   const account = useCurrentAccount();
+  const { packageId } = useNetwork();
 
-  // Query WillCreated events filtered by sender (owner)
   const { data, isLoading, error } = useSuiClientQuery(
     "queryEvents",
     {
       query: {
-        MoveEventType: `${PACKAGE_ID}::will::WillCreated`,
+        MoveEventType: `${packageId}::will::WillCreated`,
       },
       limit: 50,
     },
     {
-      enabled: !!account?.address && !!PACKAGE_ID,
+      enabled: !!account?.address && !!packageId,
     }
   );
 
-  // Find the most recent will created by this account
   console.log("Will events found:", data?.data?.length, "account:", account?.address);
   data?.data?.forEach(e => console.log("event sender:", e.sender, "match:", e.sender === account?.address));
   const willEvent = data?.data?.find(

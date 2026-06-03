@@ -1,5 +1,7 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import { useState, useEffect } from "react";
 import { useCurrentAccount, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
@@ -8,7 +10,6 @@ import ProcessorIcon from "@/components/icons/proccesor";
 import { WalletButton } from "@/components/wallet-button";
 import { Badge } from "@/components/ui/badge";
 
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
 const CLOCK_ID = process.env.NEXT_PUBLIC_SUI_CLOCK_ID!;
 
 // Timeout options in milliseconds
@@ -29,8 +30,9 @@ type Beneficiary = {
 type Step = 1 | 2 | 3 | 4;
 
 export default function CreatePage() {
+  const { packageId: PACKAGE_ID, network } = useNetwork();
   const account = useCurrentAccount();
-  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
+  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction({ waitForTransaction: false });
 
   const [step, setStep] = useState<Step>(1);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([
@@ -133,7 +135,7 @@ export default function CreatePage() {
       });
 
       signAndExecute(
-        { transaction: tx },
+        { transaction: tx, options: { showEffects: true } },
         {
           onSuccess: (result) => {
             setTxDigest(result.digest);
@@ -175,11 +177,11 @@ export default function CreatePage() {
           </div>
           <div>
             <h2 className="font-display text-4xl tracking-widest uppercase mb-2">WILL DEPLOYED</h2>
-            <p className="text-muted-foreground text-sm">Your SuiWill contract is live on Sui testnet.</p>
+            <p className="text-muted-foreground text-sm">Your SuiWill contract is live on Sui {network}.</p>
           </div>
           <div className="flex flex-col gap-2 w-full max-w-sm">
             <a
-              href={`https://suiscan.xyz/testnet/tx/${txDigest}`}
+              href={`https://suiscan.xyz/${network}/tx/${txDigest}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full text-center px-4 py-3 border border-border font-mono text-xs tracking-widest uppercase hover:border-primary hover:text-primary transition-colors rounded-md"
@@ -410,7 +412,7 @@ export default function CreatePage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="font-mono text-[10px] text-muted-foreground">NETWORK</span>
-                  <Badge variant="secondary" className="font-mono text-[9px]">SUI TESTNET</Badge>
+                  <Badge variant="secondary" className="font-mono text-[9px]">SUI {network.toUpperCase()}</Badge>
                 </div>
               </div>
             </div>

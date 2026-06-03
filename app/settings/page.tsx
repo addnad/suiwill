@@ -1,5 +1,7 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import { useCurrentAccount, useSuiClientQuery } from "@mysten/dapp-kit";
 import DashboardPageLayout from "@/components/dashboard/layout";
 import GearIcon from "@/components/icons/gear";
@@ -7,9 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { WalletButton } from "@/components/wallet-button";
 import { useWillId } from "@/hooks/use-will";
 
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
 
 export default function SettingsPage() {
+  const { packageId: PACKAGE_ID, network } = useNetwork();
   const account = useCurrentAccount();
   const { willId } = useWillId();
 
@@ -40,7 +42,7 @@ export default function SettingsPage() {
             {[
               { label: "ADDRESS", value: account?.address ?? "Not connected", mono: true },
               { label: "BALANCE", value: `${suiBalance} SUI`, mono: true },
-              { label: "NETWORK", value: "Sui Testnet", mono: false },
+              { label: "NETWORK", value: `Sui ${network.charAt(0).toUpperCase() + network.slice(1)}`, mono: false },
               { label: "STATUS", value: account ? "CONNECTED" : "DISCONNECTED", mono: false },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between py-2 border-b border-border last:border-b-0">
@@ -63,7 +65,7 @@ export default function SettingsPage() {
             {[
               { label: "PACKAGE ID", value: PACKAGE_ID },
               { label: "YOUR WILL ID", value: willId ?? "No will deployed" },
-              { label: "NETWORK", value: "Sui Testnet" },
+              { label: "NETWORK", value: `Sui ${network.charAt(0).toUpperCase() + network.slice(1)}` },
               { label: "CLOCK OBJECT", value: "0x6" },
             ].map((item) => (
               <div key={item.label} className="flex items-start justify-between py-2 border-b border-border last:border-b-0 gap-4">
@@ -74,7 +76,7 @@ export default function SettingsPage() {
           </div>
           {willId && (
             <a
-              href={`https://suiscan.xyz/testnet/object/${willId}`}
+              href={`https://suiscan.xyz/${network}/object/${willId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 w-full block text-center font-mono text-xs tracking-widest border border-border py-3 hover:border-primary hover:text-primary transition-colors rounded-md"

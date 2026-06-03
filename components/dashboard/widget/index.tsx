@@ -1,5 +1,7 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +14,7 @@ interface WidgetProps {
 }
 
 export default function Widget({ widgetData }: WidgetProps) {
+  const { network } = useNetwork();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -60,7 +63,7 @@ export default function Widget({ widgetData }: WidgetProps) {
 
         <div className="flex justify-between items-center">
           <span className="opacity-50">SUIWILL</span>
-          <span>Sui Testnet</span>
+          <span>Sui {network.charAt(0).toUpperCase() + network.slice(1)}</span>
           <Badge variant="secondary" className="bg-accent">
             ACTIVE
           </Badge>

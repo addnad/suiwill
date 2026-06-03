@@ -1,5 +1,7 @@
 "use client";
 
+import { useNetwork } from "@/components/providers";
+
 import { useParams } from "next/navigation";
 import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClientQuery } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
@@ -8,7 +10,6 @@ import ProcessorIcon from "@/components/icons/proccesor";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
-const PACKAGE_ID = process.env.NEXT_PUBLIC_SUIWILL_PACKAGE_ID!;
 const CLOCK_ID = process.env.NEXT_PUBLIC_SUI_CLOCK_ID!;
 
 function msToCountdown(ms: number) {
@@ -20,9 +21,10 @@ function msToCountdown(ms: number) {
 }
 
 export default function WillPage() {
+  const { packageId: PACKAGE_ID, network } = useNetwork();
   const { id } = useParams<{ id: string }>();
   const account = useCurrentAccount();
-  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction();
+  const { mutate: signAndExecute, isPending } = useSignAndExecuteTransaction({ waitForTransaction: false });
   const [txMsg, setTxMsg] = useState("");
   const [error, setError] = useState("");
   const [depositAmount, setDepositAmount] = useState("0.1");
@@ -149,7 +151,7 @@ export default function WillPage() {
     <DashboardPageLayout
       header={{
         title: "My Will",
-        description: `${id.slice(0, 6)}...${id.slice(-4)} · Sui Testnet`,
+        description: `${id.slice(0, 6)}...${id.slice(-4)} · Sui ${network.charAt(0).toUpperCase() + network.slice(1)}`,
         icon: ProcessorIcon,
       }}
     >
@@ -214,7 +216,7 @@ export default function WillPage() {
               { label: "TIMEOUT", value: `${timeoutMs / 86400000} days` },
               { label: "GRACE PERIOD", value: "7 days (fixed)" },
               { label: "WALRUS MESSAGE", value: walrusBlobId ? "STORED" : "NONE" },
-              { label: "NETWORK", value: "Sui Testnet" },
+              { label: "NETWORK", value: `Sui ${network.charAt(0).toUpperCase() + network.slice(1)}` },
             ].map((item) => (
               <div key={item.label} className="flex justify-between py-1 border-b border-border last:border-b-0">
                 <span className="font-mono text-[10px] text-muted-foreground">{item.label}</span>
@@ -295,7 +297,7 @@ export default function WillPage() {
                 </button>
               )}
               <a
-                href={`https://suiscan.xyz/testnet/object/${id}`}
+                href={`https://suiscan.xyz/${network}/object/${id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full text-center font-mono text-xs tracking-widest border border-border py-3 hover:border-primary hover:text-primary transition-colors rounded-md"
