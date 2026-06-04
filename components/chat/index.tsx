@@ -29,6 +29,7 @@ function sanitize(str: string): string {
 }
 
 function VIGILChat() {
+  const { network } = useNetwork();
   const account = useCurrentAccount();
   const [messages, setMessages] = useState<Message[]>([
     { id: "welcome", role: "vigil", content: "Connect your Sui wallet to get started." },
@@ -60,7 +61,7 @@ function VIGILChat() {
     const cleanInput = raw.trim().replace(/[\u2013\u2014]/g, "-").replace(/[^\x00-\x7F]/g, "");
     if (inputRef.current) { inputRef.current.value = ""; inputRef.current.style.height = "auto"; }
 
-    setMessages((prev) => [...prev, { id: Date.now().toString(), role: "user", content: cleanInput }]);
+    setMessages((prev) => [...prev, { id: `user-${Date.now()}-${Math.random()}`, role: "user", content: cleanInput }]);
     setLoading(true);
 
     try {
@@ -76,7 +77,7 @@ function VIGILChat() {
 
       if (data.success && data.type === "chat") {
         setMessages((prev) => [...prev, {
-          id: Date.now().toString(),
+          id: `vigil-${Date.now()}-${Math.random()}`,
           role: "vigil",
           content: sanitize(data.response || "I am here to help."),
         }]);
@@ -96,21 +97,22 @@ function VIGILChat() {
           ...(will.warnings?.length ? [`! ${will.warnings.join(", ")}`] : []),
         ].filter(Boolean).join("\n");
         setMessages((prev) => [...prev, {
-          id: Date.now().toString(),
+          id: `vigil-${Date.now()}-${Math.random()}`,
           role: "vigil",
           content: summary,
           willConfig: will,
         }]);
       } else {
         setMessages((prev) => [...prev, {
-          id: Date.now().toString(),
+          id: `vigil-${Date.now()}-${Math.random()}`,
           role: "vigil",
           content: data.error || "Something went wrong.",
         }]);
       }
-    } catch {
+    } catch (err) {
+      console.error("VIGIL chat error:", err);
       setMessages((prev) => [...prev, {
-        id: Date.now().toString(),
+        id: `error-${Date.now()}-${Math.random()}`,
         role: "vigil",
         content: "Network error. Please try again.",
       }]);
