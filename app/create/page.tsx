@@ -98,17 +98,24 @@ export default function CreatePage() {
     setError("");
 
     try {
-      // Upload message to Walrus if provided
+      // Upload message to Walrus
       let blobIdBytes: number[] = [];
       if (message.trim()) {
         try {
-          const encoder = new TextEncoder();
-          const msgBytes = encoder.encode(message);
-          // For testnet demo — store as UTF-8 bytes directly
-          // In production: POST to Walrus publisher endpoint
-          blobIdBytes = Array.from(msgBytes).slice(0, 32);
+          const res = await fetch("/api/walrus", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message, network }),
+          });
+          const data = await res.json();
+          if (data.blobId) {
+            blobIdBytes = Array.from(new TextEncoder().encode(data.blobId)).slice(0, 32);
+            console.log("Walrus blob ID:", data.blobId);
+          } else {
+            console.warn("Walrus upload failed:", data.error);
+          }
         } catch {
-          console.log("Walrus upload skipped — using empty blob ID");
+          console.warn("Walrus upload skipped");
         }
       }
 

@@ -11,15 +11,22 @@ const PACKAGE_IDS = {
   testnet: "0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2",
   mainnet: "0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae",
 };
+const TATUM_KEY = "t-65a7c7b760fded001ccd19d3-de68f6cb571143d58ea5c811";
 const RPC_URLS = {
-  testnet: "https://fullnode.testnet.sui.io:443",
-  mainnet: "https://fullnode.mainnet.sui.io:443",
+  primary: {
+    testnet: `https://sui-testnet.gateway.tatum.io/${TATUM_KEY}`,
+    mainnet: `https://sui-mainnet.gateway.tatum.io/${TATUM_KEY}`,
+  },
+  fallback: {
+    testnet: "https://fullnode.testnet.sui.io:443",
+    mainnet: "https://fullnode.mainnet.sui.io:443",
+  },
 };
 const PACKAGE_ID = PACKAGE_IDS[NETWORK];
 const CLOCK_ID = "0x6";
-const RPC_URL = RPC_URLS[NETWORK];
 const CHECK_INTERVAL_MS = 60000;
 console.log(`VIGIL watcher starting on ${NETWORK} — package ${PACKAGE_ID}`);
+console.log(`Primary RPC: Tatum | Fallback: Sui public fullnode`);
 
 // Load keypair from Sui CLI keystore
 function loadKeypair() {
@@ -29,16 +36,32 @@ function loadKeypair() {
   return Ed25519Keypair.fromSecretKey(keyBytes.slice(1));
 }
 
-// Raw RPC call
+// Raw RPC call with Tatum primary + fullnode fallback
 async function rpc(method, params) {
-  const res = await fetch(RPC_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(JSON.stringify(data.error));
-  return data.result;
+  const endpoints = [
+    RPC_URLS.primary[NETWORK],
+    RPC_URLS.fallback[NETWORK],
+  ];
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+        signal: AbortSignal.timeout(8000),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(JSON.stringify(data.error));
+      return data.result;
+    } catch (err) {
+      const isTatum = url.includes("tatum");
+      if (isTatum) {
+        console.warn(`Tatum RPC failed (${err.message}), falling back to public fullnode...`);
+        continue;
+      }
+      throw err;
+    }
+  }
 }
 
 async function queryEvents(eventType, cursor = null) {

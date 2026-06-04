@@ -8,6 +8,17 @@ import { Transaction } from "@mysten/sui/transactions";
 import DashboardPageLayout from "@/components/dashboard/layout";
 import ProcessorIcon from "@/components/icons/proccesor";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useState } from "react";
 
 const CLOCK_ID = process.env.NEXT_PUBLIC_SUI_CLOCK_ID!;
@@ -71,7 +82,15 @@ export default function WillPage() {
   const inGrace = fields.in_grace as boolean;
   const graceStartMs = parseInt(fields.grace_start_ms as string);
   const owner = fields.owner as string;
-  const walrusBlobId = fields.walrus_blob_id as string;
+  const walrusBlobIdRaw = fields.walrus_blob_id as number[] | string;
+  // Convert raw bytes back to base64url string
+  const walrusBlobId = (() => {
+    if (!walrusBlobIdRaw || (Array.isArray(walrusBlobIdRaw) && walrusBlobIdRaw.length === 0)) return null;
+    if (typeof walrusBlobIdRaw === "string") return walrusBlobIdRaw;
+    const bytes = new Uint8Array(walrusBlobIdRaw);
+    const binary = Array.from(bytes).map(b => String.fromCharCode(b)).join("");
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  })();
 
   const msUntilTrigger = Math.max(0, lastSeenMs + timeoutMs - now);
   const daysAgo = Math.floor((now - lastSeenMs) / 86400000);
@@ -103,17 +122,15 @@ export default function WillPage() {
     });
   }
 
-  async function handleWithdrawAll() {
+  async function handleCloseWill() {
     setError(""); setTxMsg("");
-    const vaultBalance = parseInt(fields?.vault as string ?? "0");
-    if (vaultBalance === 0) { setError("Vault is empty"); return; }
     const tx = new Transaction();
     tx.moveCall({
-      target: `${PACKAGE_ID}::will::withdraw`,
-      arguments: [tx.object(id), tx.pure.u64(BigInt(vaultBalance))],
+      target: `${PACKAGE_ID}::will::close_will`,
+      arguments: [tx.object(id)],
     });
     signAndExecute({ transaction: tx }, {
-      onSuccess: (r) => { setTxMsg(`Withdrew ${(vaultBalance/1_000_000_000).toFixed(4)} SUI. Tx: ${r.digest.slice(0, 20)}...`); refetch(); },
+      onSuccess: (r) => { setTxMsg(`Will closed. Funds returned. Tx: ${r.digest.slice(0, 20)}...`); refetch(); },
       onError: (e) => setError(e.message),
     });
   }
@@ -215,7 +232,7 @@ export default function WillPage() {
               { label: "VAULT BALANCE", value: `${(parseInt(fields.vault as string ?? "0") / 1_000_000_000).toFixed(4)} SUI` },
               { label: "TIMEOUT", value: `${timeoutMs / 86400000} days` },
               { label: "GRACE PERIOD", value: "7 days (fixed)" },
-              { label: "WALRUS MESSAGE", value: walrusBlobId ? "STORED" : "NONE" },
+              { label: "WALRUS MESSAGE", value: walrusBlobId ? `${walrusBlobId.slice(0, 12)}...` : "NONE" },
               { label: "NETWORK", value: `Sui ${network.charAt(0).toUpperCase() + network.slice(1)}` },
             ].map((item) => (
               <div key={item.label} className="flex justify-between py-1 border-b border-border last:border-b-0">
@@ -224,6 +241,19 @@ export default function WillPage() {
               </div>
             ))}
           </div>
+          {walrusBlobId && (
+            <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+              <span className="font-mono text-[9px] text-muted-foreground tracking-widest">WALRUS BLOB ID</span>
+              <a
+                href={`https://aggregator.walrus-testnet.walrus.space/v1/blobs/${walrusBlobId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[9px] text-primary hover:underline tracking-widest"
+              >
+                {walrusBlobId.slice(0, 16)}... VIEW ON WALRUS
+              </a>
+            </div>
+          )}
         </div>
 
         {isOwner && (
@@ -278,14 +308,34 @@ export default function WillPage() {
                   </div>
                 </div>
               )}
-              {!inGrace && parseInt(fields?.vault as string ?? "0") > 0 && (
-                <button
-                  onClick={handleWithdrawAll}
-                  disabled={isPending}
-                  className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-destructive hover:text-destructive transition-colors disabled:opacity-50 rounded-md"
-                >
-                  {isPending ? "SIGNING..." : "WITHDRAW ALL FROM VAULT"}
-                </button>
+              {!inGrace && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      disabled={isPending}
+                      className="w-full font-mono text-xs tracking-widest border border-border py-3 hover:border-destructive hover:text-destructive transition-colors disabled:opacity-50 rounded-md"
+                    >
+                      {isPending ? "SIGNING..." : "CLOSE WILL"}
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="font-display tracking-widest uppercase">Close Will</AlertDialogTitle>
+                      <AlertDialogDescription className="font-mono text-xs">
+                        This will permanently delete your SuiWill contract and return any remaining vault balance to your wallet. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="font-mono text-xs tracking-widest">CANCEL</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleCloseWill}
+                        className="font-mono text-xs tracking-widest bg-destructive hover:bg-destructive/90"
+                      >
+                        CLOSE WILL
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
               {inGrace && (
                 <button
