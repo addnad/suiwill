@@ -1,7 +1,6 @@
 # SuiWill — Trustless Digital Estate Vault on Sui
 
-> Built for Sui Overflow 2026 · Agentic Web + Walrus tracks
-> Also submitted to Tatum x Walrus Hackathon
+> Built for Tatum x Walrus Hackathon
 
 SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signing transactions for a configured period, your will executes automatically — distributing locked vault assets to your beneficiaries and unlocking your final message stored on Walrus. No lawyers. No intermediaries. No trust required.
 
@@ -12,7 +11,6 @@ SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signi
 - **App:** https://suiwill.vercel.app
 - **Contract (Sui Testnet):** `0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2`
 - **Contract (Sui Mainnet):** `0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae`
-- **Example Will:** https://suiscan.xyz/testnet/object/0x6320e97ab04df18cb51bc6eef312a9b4dae3abd3189dc2658a02da4cd68d75af
 - **GitHub:** https://github.com/addnad/suiwill
 
 ---
@@ -156,10 +154,9 @@ pnpm install
 
 Create `.env.local`:
 ```
-NEXT_PUBLIC_SUIWILL_PACKAGE_ID=0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2
 NEXT_PUBLIC_TESTNET_PACKAGE_ID=0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2
 NEXT_PUBLIC_MAINNET_PACKAGE_ID=0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae
-NEXT_PUBLIC_SUIWILL_NETWORK=testnet
+NEXT_PUBLIC_SUIWILL_NETWORK=testnet/mainnet
 NEXT_PUBLIC_SUI_CLOCK_ID=0x6
 OPENROUTER_API_KEY=your_openrouter_key
 TATUM_API_KEY=your_tatum_api_key
@@ -178,7 +175,7 @@ pnpm install
 node index.js
 ```
 
-The watcher uses your local Sui CLI keypair at `~/.sui/sui_config/sui.keystore`. Ensure it has testnet SUI for gas.
+The watcher uses your local Sui CLI keypair at `~/.sui/sui_config/sui.keystore`. Ensure it has testnet/mainnet SUI for gas.
 
 ### Move Contract
 
