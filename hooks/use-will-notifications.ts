@@ -88,6 +88,32 @@ function getEventNotification(event: {
     };
   }
 
+  if (event.type.includes("FundsDeposited") && parsed?.owner === account) {
+    const amount = parsed?.amount ? (parseInt(parsed.amount) / 1_000_000_000).toFixed(3) : "?";
+    return {
+      id,
+      title: "VAULT DEPOSIT",
+      message: `${amount} SUI deposited into your will vault.`,
+      timestamp: ts,
+      type: "info",
+      read: false,
+      priority: "low",
+    };
+  }
+
+  if (event.type.includes("FundsWithdrawn") && parsed?.owner === account) {
+    const amount = parsed?.amount ? (parseInt(parsed.amount) / 1_000_000_000).toFixed(3) : "?";
+    return {
+      id,
+      title: "VAULT WITHDRAWAL",
+      message: `${amount} SUI withdrawn from your will vault.`,
+      timestamp: ts,
+      type: "info",
+      read: false,
+      priority: "low",
+    };
+  }
+
   return null;
 }
 
@@ -101,6 +127,8 @@ export function useWillNotifications() {
     "GraceTriggered",
     "GraceCancelled",
     "WillExecuted",
+    "FundsDeposited",
+    "FundsWithdrawn",
   ];
 
   const results = eventTypes.map((eventType) =>
