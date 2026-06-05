@@ -2,7 +2,7 @@
 
 > Built for Tatum x Walrus Hackathon
 
-SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signing transactions for a configured period, your will executes automatically — distributing locked vault assets to your beneficiaries and unlocking your final message stored on Walrus. No lawyers. No intermediaries. No trust required.
+SuiWill is a trustless digital estate vault on Sui blockchain. Users choose their own inactivity period, and if no activity is detected before that period expires, the inheritance process begins automatically — distributing locked vault assets to beneficiaries and unlocking a final message stored on Walrus. No lawyers. No intermediaries. No trust required.
 
 ---
 
@@ -18,7 +18,7 @@ SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signi
 ## How It Works
 
 ```
-1. CONFIGURE  — Connect wallet. Set beneficiaries + percentage splits.
+1. CONFIGURE  — Connect wallet. Set beneficiaries + percentage splits, and your inactivity timeout.
 2. VAULT      — Deposit SUI into the will vault at creation time.
 3. MESSAGE    — Write a final message. Uploaded to Walrus as a verifiable blob.
 4. DEPLOY     — SuiWill Move contract deployed onchain. Blob ID anchored in contract.
@@ -27,6 +27,23 @@ SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signi
 7. GRACE      — 7-day grace period. Cancel anytime with a single signed tx.
 8. EXECUTE    — Vault balance distributed atomically to beneficiaries. Message unlocked.
 ```
+
+---
+
+## User-Defined Inactivity Period
+
+Every SuiWill includes a customizable inactivity timeout chosen by the owner during creation.
+
+Examples:
+- 30 days
+- 90 days
+- 180 days
+- 1 year
+- Multiple years
+
+Any signed Sui transaction resets the inactivity timer. If no activity is detected before the selected timeout expires, the VIGIL watcher triggers a 7-day grace period. During the grace period, the owner can cancel execution at any time with a single signed transaction.
+
+This ensures users remain in full control of when inheritance automation can begin.
 
 ---
 
@@ -96,7 +113,7 @@ When you create a SuiWill, you deposit SUI directly into the contract vault. Ass
 
 | Function | Description |
 |---|---|
-| `create_will` | Deploy a new SuiWill shared object with initial vault deposit |
+| `create_will` | Deploy a new SuiWill shared object with beneficiaries, inactivity timeout, and initial vault deposit |
 | `deposit` | Add SUI to the vault (owner only) |
 | `withdraw` | Withdraw SUI from vault (owner only, not in grace) |
 | `heartbeat` | Reset inactivity clock (owner only) |
