@@ -11,6 +11,7 @@ SuiWill is a trustless digital estate vault on Sui blockchain. If you stop signi
 
 - **App:** https://suiwill.vercel.app
 - **Contract (Sui Testnet):** `0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2`
+- **Contract (Sui Mainnet):** `0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae`
 - **Example Will:** https://suiscan.xyz/testnet/object/0x6320e97ab04df18cb51bc6eef312a9b4dae3abd3189dc2658a02da4cd68d75af
 - **GitHub:** https://github.com/addnad/suiwill
 
@@ -88,7 +89,8 @@ When you create a SuiWill, you deposit SUI directly into the contract vault. Ass
 ## Contract
 
 **Package ID (Testnet):** `0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2`
-**Network:** Sui Testnet
+**Package ID (Mainnet):** `0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae`
+**Networks:** Sui Testnet + Sui Mainnet
 **Module:** `will`
 **Clock Object:** `0x6`
 
@@ -156,7 +158,7 @@ Create `.env.local`:
 ```
 NEXT_PUBLIC_SUIWILL_PACKAGE_ID=0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2
 NEXT_PUBLIC_TESTNET_PACKAGE_ID=0xff06e13ff081039003ddbbb7739ed5f43f75298e470f6d09452ef693adac83d2
-NEXT_PUBLIC_MAINNET_PACKAGE_ID=
+NEXT_PUBLIC_MAINNET_PACKAGE_ID=0x8cbf4b60bff206ce8ef24f7b4a9344eec01a862d3ec206262600b3da86419cae
 NEXT_PUBLIC_SUIWILL_NETWORK=testnet
 NEXT_PUBLIC_SUI_CLOCK_ID=0x6
 OPENROUTER_API_KEY=your_openrouter_key
