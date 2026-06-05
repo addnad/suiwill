@@ -67,7 +67,12 @@ export function useWillId() {
     ? (willEvent.parsedJson as { will_id: string })?.will_id
     : null;
 
-  return { willId, isLoading, error };
+  const willIds = (data?.data ?? [])
+    .filter((e) => e.sender === account?.address)
+    .map((e) => (e.parsedJson as { will_id: string })?.will_id)
+    .filter(Boolean) as string[];
+
+  return { willId, willIds, isLoading, error };
 }
 
 export function useWill() {

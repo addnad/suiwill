@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const WALRUS_PUBLISHER_TESTNET = "https://publisher.walrus-testnet.walrus.space";
-const WALRUS_PUBLISHER_MAINNET = "https://publisher.walrus.space";
+const WALRUS_PUBLISHER = "https://publisher.walrus-testnet.walrus.space";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,8 +9,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ blobId: null });
     }
 
-    const publisher = network === "mainnet" ? WALRUS_PUBLISHER_MAINNET : WALRUS_PUBLISHER_TESTNET;
-    const epochs = 200;
+    const publisher = WALRUS_PUBLISHER;
+    const epochs = 5;
 
     const res = await fetch(`${publisher}/v1/blobs?epochs=${epochs}`, {
       method: "PUT",

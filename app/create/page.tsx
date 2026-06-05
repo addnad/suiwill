@@ -109,8 +109,11 @@ export default function CreatePage() {
           });
           const data = await res.json();
           if (data.blobId) {
-            blobIdBytes = Array.from(new TextEncoder().encode(data.blobId)).slice(0, 32);
-            console.log("Walrus blob ID:", data.blobId);
+            // Decode base64url blob ID to raw 32 bytes
+            const b64 = data.blobId.replace(/-/g, "+").replace(/_/g, "/");
+            const binary = atob(b64);
+            blobIdBytes = Array.from({ length: binary.length }, (_, i) => binary.charCodeAt(i));
+            console.log("Walrus blob ID:", data.blobId, "bytes:", blobIdBytes.length);
           } else {
             console.warn("Walrus upload failed:", data.error);
           }

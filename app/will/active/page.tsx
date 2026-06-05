@@ -16,6 +16,9 @@ function WillCard({ willId }: { willId: string }) {
     { refetchInterval: 30000 }
   );
 
+  // If object not found or deleted, render nothing
+  if (!data?.data) return null;
+
   const fields = data?.data?.content?.dataType === "moveObject"
     ? (data.data.content.fields as Record<string, unknown>)
     : null;
