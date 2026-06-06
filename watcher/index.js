@@ -14,12 +14,12 @@ const PACKAGE_IDS = {
 const TATUM_KEY = "t-65a7c7b760fded001ccd19d3-de68f6cb571143d58ea5c811";
 const RPC_URLS = {
   primary: {
-    testnet: `https://sui-testnet.gateway.tatum.io/${TATUM_KEY}`,
-    mainnet: `https://sui-mainnet.gateway.tatum.io/${TATUM_KEY}`,
-  },
-  fallback: {
     testnet: "https://fullnode.testnet.sui.io:443",
     mainnet: "https://fullnode.mainnet.sui.io:443",
+  },
+  fallback: {
+    testnet: `https://sui-testnet.gateway.tatum.io/${TATUM_KEY}`,
+    mainnet: `https://sui-mainnet.gateway.tatum.io/${TATUM_KEY}`,
   },
 };
 const PACKAGE_ID = PACKAGE_IDS[NETWORK];
@@ -48,7 +48,7 @@ async function rpc(method, params) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(30000),
       });
       const data = await res.json();
       if (data.error) throw new Error(JSON.stringify(data.error));
@@ -79,7 +79,7 @@ async function getObject(id) {
 
 const keypair = loadKeypair();
 const watcherAddress = keypair.getPublicKey().toSuiAddress();
-const coreClient = new CoreClient({ url: RPC_URL });
+const coreClient = new CoreClient({ url: RPC_URLS.primary[NETWORK] });
 
 console.log("=================================");
 console.log("VIGIL WATCHER AGENT");
@@ -105,18 +105,13 @@ async function getAllWills() {
 }
 
 async function triggerGrace(willId) {
-  const tx = new Transaction();
-  tx.moveCall({
-    target: `${PACKAGE_ID}::will::trigger_grace`,
-    arguments: [tx.object(willId), tx.object(CLOCK_ID)],
-  });
-
-  const result = await coreClient.signAndExecuteTransaction({
-    transaction: tx,
-    signer: keypair,
-  });
-
-  return result.digest;
+  const { execSync } = await import("child_process");
+  const cmd = `sui client call --package ${PACKAGE_ID} --module will --function trigger_grace --args ${willId} ${CLOCK_ID} --gas-budget 20000000 --json`;
+  const output = JSON.parse(execSync(cmd, { encoding: "utf8" }));
+  if (output.effects?.status?.status !== "success") {
+    throw new Error(`Tx failed: ${JSON.stringify(output.effects?.status)}`);
+  }
+  return output.effects.transactionDigest;
 }
 
 async function checkWills() {
@@ -131,7 +126,13 @@ async function checkWills() {
       const willId = event.parsedJson?.will_id;
       if (!willId) continue;
 
-      const obj = await getObject(willId);
+      let obj;
+      try {
+        obj = await getObject(willId);
+      } catch (e) {
+        console.log(`  [SKIP] ${willId.slice(0,10)}... object not found or deleted`);
+        continue;
+      }
       const content = obj?.data?.content;
       if (!content || content.dataType !== "moveObject") continue;
 

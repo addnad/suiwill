@@ -14,6 +14,7 @@ const CLOCK_ID = process.env.NEXT_PUBLIC_SUI_CLOCK_ID!;
 
 // Timeout options in milliseconds
 const TIMEOUT_OPTIONS = [
+  { label: "1 min", value: 60 * 1000 },
   { label: "30 days",  value: 30 * 24 * 60 * 60 * 1000 },
   { label: "60 days",  value: 60 * 24 * 60 * 60 * 1000 },
   { label: "90 days",  value: 90 * 24 * 60 * 60 * 1000 },
